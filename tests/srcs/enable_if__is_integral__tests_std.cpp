@@ -1,6 +1,5 @@
 #include <iostream>
-#include "enable_if.hpp"
-#include "is_integral.hpp"
+#include <type_traits>
 
 #define HEADER1		"*****************************************************\n*"
 #define HEADER2		"*\n*****************************************************\n"
