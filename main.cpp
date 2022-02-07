@@ -2,6 +2,7 @@
 #include "enable_if__is_integral__tests.hpp"
 #include "equal__tests.hpp"
 #include "lexicographical_compare__tests.hpp"
+#include "pair__tests.hpp"
 
 int	main(void)
 {
@@ -10,5 +11,7 @@ int	main(void)
 	equal__tests();
 	std::cout << std::endl;
 	lexicographical_compare__tests();
+	std::cout << std::endl;
+	pair__tests();
 	return (0);
 }
