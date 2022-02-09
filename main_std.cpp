@@ -4,6 +4,7 @@
 #include "lexicographical_compare__tests_std.hpp"
 #include "pair__tests_std.hpp"
 #include "make_pair__tests_std.hpp"
+#include "iterator_traits__tests_std.hpp"
 
 int	main(void)
 {
@@ -16,5 +17,7 @@ int	main(void)
 	pair__tests_std();
 	std::cout << std::endl;
 	make_pair__tests_std();
+	std::cout << std::endl;
+	iterator_traits__tests_std();
 	return (0);
 }

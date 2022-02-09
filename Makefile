@@ -6,7 +6,7 @@
 #    By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/05 20:03:04 by jmazoyer          #+#    #+#              #
-#    Updated: 2022/02/08 15:31:40 by jmazoyer         ###   ########.fr        #
+#    Updated: 2022/02/09 17:03:30 by jmazoyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,14 +44,16 @@ SRC_NAME		=	main.cpp							\
 					equal__tests.cpp					\
 					lexicographical_compare__tests.cpp	\
 					pair__tests.cpp						\
-					make_pair__tests.cpp
+					make_pair__tests.cpp				\
+					iterator_traits__tests.cpp
 
 SRC_NAME_STD	=	main_std.cpp							\
 					enable_if__is_integral__tests_std.cpp	\
 					equal__tests_std.cpp					\
 					lexicographical_compare__tests_std.cpp	\
 					pair__tests_std.cpp						\
-					make_pair__tests_std.cpp
+					make_pair__tests_std.cpp				\
+					iterator_traits__tests_std.cpp
 
 OBJ_PATH		= objs
 OBJ				= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=.o))
