@@ -5,6 +5,7 @@
 #include "pair__tests_std.hpp"
 #include "make_pair__tests_std.hpp"
 #include "iterator_traits__tests_std.hpp"
+#include "reverse_iterator__tests_std.hpp"
 
 int	main(void)
 {
@@ -19,5 +20,7 @@ int	main(void)
 	make_pair__tests_std();
 	std::cout << std::endl;
 	iterator_traits__tests_std();
+	std::cout << std::endl;
+	reverse_iterator__tests_std();
 	return (0);
 }
