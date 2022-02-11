@@ -1,26 +1,30 @@
 #include <iostream>
+#include <utility>
 #include "pair.hpp"
 
-#define HEADER1		"*****************************************************\n*"
-#define HEADER2		"*\n*****************************************************\n"
-#define SPACE15		"               "
+#ifndef STD
+# define NMSP	ft
+#else
+# define NMSP	std
+#endif
+
+/******************************************************************************/
+/*                                   TESTS                                    */
+/******************************************************************************/
 
 void	pair__tests(void)
 {
 	const std::pair<const std::string,
-		const float>				product0("Hello!", 0.f);
-	ft::pair<std::string, float>	product1;
-	ft::pair<std::string, float>	product1bis;
-	ft::pair<ft::pair<std::string, float>::first_type, ft::pair<std::string,
-		float>::second_type>		product2("Apples", 3.5);
-	ft::pair<std::string, float>	product3(ft::pair<const char*,
+		const float>							product0("Hello!", 0.f);
+	NMSP::pair<std::string, float>				product1;
+	NMSP::pair<std::string, float>				product1bis;
+	NMSP::pair<NMSP::pair<std::string, float>::first_type, NMSP::pair
+		<std::string,float>::second_type>		product2("Apples", 3.5);
+	NMSP::pair<std::string, float>				product3(NMSP::pair<const char*,
 															int>("Pears", 4));
 
-	std::cout << HEADER1 << SPACE15 << "        PAIR         "
-		<< SPACE15 << HEADER2 << std::endl;
-
 	std::cout << std::boolalpha;
-	product1 = ft::pair<std::string, float>("Oranges", 3.9);
+	product1 = NMSP::pair<std::string, float>("Oranges", 3.9);
 	std::cout << product1.first << " ($" << product1.second << ") == "
 		<< product1.first << " ($" << product1.second << "): "
 		<< (product1 == product1) << std::endl;

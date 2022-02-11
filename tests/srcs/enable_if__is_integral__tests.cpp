@@ -1,53 +1,76 @@
 #include <iostream>
+#include <type_traits>
 #include "enable_if.hpp"
 #include "is_integral.hpp"
 
-#define HEADER1		"*****************************************************\n*"
-#define HEADER2		"*\n*****************************************************\n"
-#define SPACE15		"               "
+#ifndef STD
+# define NMSP	ft
+#else
+# define NMSP	std
+#endif
+
+/******************************************************************************/
+/*                            TEMPLATES / FUNCTIONS                           */
+/******************************************************************************/
+
+/*
+** If the template type parameter passed to these functions
+** is not an integral type, the compilation should fail
+*/
 
 template <typename T>
-typename ft::enable_if<ft::is_integral<T>::value, bool>::type	isOdd(T i)
+typename NMSP::enable_if<NMSP::is_integral<T>::value, bool>::type	isOdd(T i)
 {
 	return (i % 2);
 }
 
 template <typename T>
-bool	isEven(T i, typename ft::enable_if
-									<ft::is_integral<T>::value>::type* = NULL)
-//									<ft::is_integral<T>::value, int>::type = 0)
+bool	isEven(T i, typename NMSP::enable_if
+								<NMSP::is_integral<T>::value>::type* = NULL)
+//								<NMSP::is_integral<T>::value, int>::type = 0)
 {
 	return (!(i % 2));
 }
 
+/*
+** Levaraging SFINAE, the right function should be selected from
+** the Overload Set without any compilation error
+*/
+
 template <typename T>
-typename ft::enable_if<(sizeof(T) <= sizeof(int))>::type	cmpToInt(void)
+typename NMSP::enable_if<(sizeof(T) <= sizeof(int))>::type	cmpToInt(void)
 {
 	std::cout << "is <= int" << std::endl;
 }
 
 template <typename T>
-typename ft::enable_if<(sizeof(T) > sizeof(int))>::type	cmpToInt(void)
+typename NMSP::enable_if<(sizeof(T) > sizeof(int))>::type	cmpToInt(void)
 {
 	std::cout << "is > int" << std::endl;
 }
+
+/*
+** If implemented correctly, is_integral calls should be valid with
+** either the "::value" member or the "()" type operator, and ignore
+** the topmost "const" and "volatile" qualifiers
+*/
 
 template <typename T>
 void	isIntegral(void)
 {
 	std::cout << "is an integral type: ";
-	if (ft::is_integral<T>::value)
+	if (NMSP::is_integral<T>::value)
 		std::cout << "true" << std::endl;
-	else if (!ft::is_integral<T>())
+	else if (!NMSP::is_integral<T>())
 		std::cout << "false" << std::endl;
 }
 
+/******************************************************************************/
+/*                                   TESTS                                    */
+/******************************************************************************/
+
 void	enable_if__is_integral__tests(void)
 {
-	std::cout << HEADER1 << SPACE15 << "      ENABLE_IF      " << SPACE15
-		<< "*\n*       (if not done right it doesn't compile)      "
-		<< HEADER2 << std::endl;
-
 	std::cout << std::boolalpha;
 	std::cout << "isOdd(char(2): " << isOdd(char(2)) << std::endl;
 	std::cout << "isEven(short(2): " << isEven(short(2)) << std::endl;
@@ -62,9 +85,6 @@ void	enable_if__is_integral__tests(void)
 	std::cout << "float "; cmpToInt<float>();
 	std::cout << "long "; cmpToInt<long>();
 	std::cout << "double "; cmpToInt<double>(); std::cout << std::endl;
-
-	std::cout << HEADER1 << SPACE15 << "     IS_INTEGRAL     " << SPACE15
-		<< HEADER2 << std::endl;
 
 	std::cout << "wchar_t "; isIntegral<wchar_t>();
 	std::cout << "const short int "; isIntegral<const short int>();

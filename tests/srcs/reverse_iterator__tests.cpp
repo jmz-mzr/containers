@@ -5,9 +5,15 @@
 #include <iterator>
 #include "reverse_iterator.hpp"
 
-#define HEADER1		"*****************************************************\n*"
-#define HEADER2		"*\n*****************************************************\n"
-#define SPACE15		"               "
+#ifndef STD
+# define NMSP	ft
+#else
+# define NMSP	std
+#endif
+
+/******************************************************************************/
+/*                                   TESTS                                    */
+/******************************************************************************/
 
 void	reverse_iterator__tests(void)
 {
@@ -15,24 +21,21 @@ void	reverse_iterator__tests(void)
 	std::vector<int>		vec(array, array + 5);
 	const char*				arr[3] = {"Hello", ", ", "world"};
 	std::list<std::string>	lst(arr, arr + 3);
-	ft::reverse_iterator<int*>
+	NMSP::reverse_iterator<int*>
 							revIt;
-	ft::reverse_iterator<const int*>
+	NMSP::reverse_iterator<const int*>
 							revIt2(revIt);
-	ft::reverse_iterator<std::vector<int>::iterator>
+	NMSP::reverse_iterator<std::vector<int>::iterator>
 							revItVec1(vec.end());
-	ft::reverse_iterator<std::vector<int>::iterator>
+	NMSP::reverse_iterator<std::vector<int>::iterator>
 							revItVec2(vec.end());
-	ft::reverse_iterator<std::list<std::string>::iterator>
+	NMSP::reverse_iterator<std::list<std::string>::iterator>
 							revItLst1(lst.end());
-	ft::reverse_iterator<std::list<std::string>::iterator>
+	NMSP::reverse_iterator<std::list<std::string>::iterator>
 							revItLst2(lst.begin());
 
-	std::cout << HEADER1 << SPACE15 << "  REVERSE_ITERATOR   " << SPACE15
-		<< HEADER2 << std::endl;
-
-	revIt2 = ft::reverse_iterator<int*>();
-	revItVec2 = ft::reverse_iterator<std::vector<int>::iterator>(vec.begin());
+	revIt2 = NMSP::reverse_iterator<int*>();
+	revItVec2 = NMSP::reverse_iterator<std::vector<int>::iterator>(vec.begin());
 	std::cout << "Constructors and assignment operators work as expected\n"
 		<< std::endl;
 
@@ -56,11 +59,11 @@ void	reverse_iterator__tests(void)
 	if (revItVec1.base() == vec.begin())
 		std::cout << "Operator+/-/+=/-= all work as expected\n" << std::endl;
 
-	revItVec1 = ft::reverse_iterator<std::vector<int>::iterator>(vec.end());
+	revItVec1 = NMSP::reverse_iterator<std::vector<int>::iterator>(vec.end());
 	revItVec1 = (5 + revItVec1);
 	if (revItVec1.base() == vec.begin())
 		std::cout << "Operator+(n, revIt) work as expected" << std::endl;
-	revItVec1 = ft::reverse_iterator<std::vector<int>::iterator>(vec.end());
+	revItVec1 = NMSP::reverse_iterator<std::vector<int>::iterator>(vec.end());
 	if (revItVec1 - revItVec2 == -5 && revItVec2 - revItVec1 == 5)
 		std::cout << "Operator-(revIt1, revIt2) work as expected\n"
 			<< std::endl;

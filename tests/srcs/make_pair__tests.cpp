@@ -1,24 +1,28 @@
 #include <iostream>
+#include <utility>
 #include "make_pair.hpp"
 
-#define HEADER1		"*****************************************************\n*"
-#define HEADER2		"*\n*****************************************************\n"
-#define SPACE15		"               "
+#ifndef STD
+# define NMSP	ft
+#else
+# define NMSP	std
+#endif
+
+/******************************************************************************/
+/*                                   TESTS                                    */
+/******************************************************************************/
 
 void	make_pair__tests(void)
 {
-	const ft::pair<const std::string, const float>
-									product1(ft::make_pair("Pineapples", 7.8f));
-	ft::pair<const char*, float>	product2(ft::make_pair("Lemons", 4.2f));
-	const ft::pair<const std::string, const float>	
-									product3(ft::make_pair("fsdsf", 5));
-	const ft::pair<std::string, float>
-									product4(product3);
-	ft::pair<std::string, float>	array[4] = {product1, product2,
-												product3, product4};
-
-	std::cout << HEADER1 << SPACE15 << "      MAKE_PAIR      "
-		<< SPACE15 << HEADER2 << std::endl;
+	const NMSP::pair<const std::string, const float>
+									prod1(NMSP::make_pair("Pineapples", 7.8f));
+	NMSP::pair<const char*, float>	prod2(NMSP::make_pair("Lemons", 4.2f));
+	const NMSP::pair<const std::string, const float>	
+									prod3(NMSP::make_pair("fsdsf", 5));
+	const NMSP::pair<std::string, float>
+									prod4(prod3);
+	NMSP::pair<std::string, float>	array[4] = {prod1, prod2,
+												prod3, prod4};
 
 	array[2].first = "Bananas";
 	array[3].first = "Mangos";

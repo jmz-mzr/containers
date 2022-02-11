@@ -1,42 +1,59 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <iterator>
 #include "iterator_traits.hpp"
 
-#define HEADER1		"*****************************************************\n*"
-#define HEADER2		"*\n*****************************************************\n"
-#define SPACE15		"               "
+#ifndef STD
+# define NMSP	ft
+#else
+# define NMSP	std
+#endif
+
+/******************************************************************************/
+/*                            TEMPLATES / FUNCTIONS                           */
+/******************************************************************************/
+
+/*
+** The right iterator_tag should be included in the iterator_traits in order
+** for SFINAE to select the right helper function from the Overload Set
+*/
 
 template <typename RandomAccessIt>
-typename ft::iterator_traits<RandomAccessIt>::difference_type
+typename NMSP::iterator_traits<RandomAccessIt>::difference_type
 	myDistance(RandomAccessIt first, RandomAccessIt last,
 				std::random_access_iterator_tag)
 {
 	return (last - first);
 }
 template <typename InputIt>
-typename ft::iterator_traits<InputIt>::difference_type
+typename NMSP::iterator_traits<InputIt>::difference_type
 	myDistance(InputIt first, InputIt last, std::input_iterator_tag)
 {
-	typename ft::iterator_traits<InputIt>::difference_type	n = 0;
+	typename NMSP::iterator_traits<InputIt>::difference_type	n = 0;
 
 	for ( ; first != last; ++n, ++first)
 		;
 	return (n);
 }
 template <typename Iter>
-typename ft::iterator_traits<Iter>::difference_type
+typename NMSP::iterator_traits<Iter>::difference_type
 	myDistance(Iter first, Iter last)
 {
 	return (myDistance(first, last,
-				typename ft::iterator_traits<Iter>::iterator_category()));
+				typename NMSP::iterator_traits<Iter>::iterator_category()));
 }
+
+/*
+** The "const T*" specialization should be implemented for the "::value_type"
+** member not be const qualified
+*/
 
 template <typename BidirIt>
 void	myReverse(BidirIt first, BidirIt last)
 {
-	typename ft::iterator_traits<BidirIt>::difference_type	n = 0;
-	typename ft::iterator_traits<BidirIt>::value_type		tmp;
+	typename NMSP::iterator_traits<BidirIt>::difference_type	n = 0;
+	typename NMSP::iterator_traits<BidirIt>::value_type			tmp;
 
 	if (first != last) {
 		n = myDistance(first, last) / 2;
@@ -51,7 +68,7 @@ void	myReverse(BidirIt first, BidirIt last)
 template <typename T>
 void	myReverse(const T* first, const T* last)
 {
-	typename ft::iterator_traits<const T*>::value_type	tmp = *first;
+	typename NMSP::iterator_traits<const T*>::value_type	tmp = *first;
 
 	if (first != last)
 		tmp = *(last - 1);
@@ -60,7 +77,7 @@ void	myReverse(const T* first, const T* last)
 template <typename BidirIt>
 void	print(BidirIt first, BidirIt last)
 {
-	typename ft::iterator_traits<BidirIt>::value_type	tmp = *first;
+	typename NMSP::iterator_traits<BidirIt>::value_type	tmp = *first;
 
 	if (first != last) {
 		tmp = *--last;
@@ -73,7 +90,7 @@ void	print(BidirIt first, BidirIt last)
 template <typename T>
 void	print(const T* first, const T* last)
 {
-	typename ft::iterator_traits<const T*>::value_type	tmp = *first;
+	typename NMSP::iterator_traits<const T*>::value_type	tmp = *first;
 
 	if (first != last)
 		tmp = *(last - 1);
@@ -82,11 +99,12 @@ void	print(const T* first, const T* last)
 	std::cout << std::endl;
 }
 
+/******************************************************************************/
+/*                                   TESTS                                    */
+/******************************************************************************/
+
 void	iterator_traits__tests(void)
 {
-	std::cout << HEADER1 << SPACE15 << "   ITERATOR_TRAITS   " << SPACE15
-		<< HEADER2 << std::endl;
-
 	int						array1[5] = {0, 1, 2, 3, 4};
 	std::vector<int>		vec(array1, array1 + 5);
 	const char* const		array2[4] = {"Hello", ", ", "world", "!"};

@@ -6,7 +6,7 @@
 #    By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/05 20:03:04 by jmazoyer          #+#    #+#              #
-#    Updated: 2022/02/10 20:58:32 by jmazoyer         ###   ########.fr        #
+#    Updated: 2022/02/11 11:47:15 by jmazoyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ NAME_STD	= ft_containers_tests_std
 AUTHOR		= jmazoyer
 
 CC			= clang++
-CFLAGS		= -std=c++98 -Wall -Wextra -Werror
+CFLAGS		= -Wall -Wextra -Werror -std=c++98
 CPPFLAGS	= $(foreach path, $(INC_PATH), -I$(path))
 CPPFLAGS	+= -MMD
 RM			= rm -fr
@@ -48,18 +48,9 @@ SRC_NAME		=	main.cpp							\
 					iterator_traits__tests.cpp			\
 					reverse_iterator__tests.cpp
 
-SRC_NAME_STD	=	main_std.cpp							\
-					enable_if__is_integral__tests_std.cpp	\
-					equal__tests_std.cpp					\
-					lexicographical_compare__tests_std.cpp	\
-					pair__tests_std.cpp						\
-					make_pair__tests_std.cpp				\
-					iterator_traits__tests_std.cpp			\
-					reverse_iterator__tests_std.cpp
-
 OBJ_PATH		= objs
 OBJ				= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=.o))
-OBJ_STD			= $(addprefix $(OBJ_PATH)/, $(SRC_NAME_STD:.cpp=.o))
+OBJ_STD			= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=_std.o))
 
 DEP				= $(OBJ:.o=.d)
 
@@ -158,6 +149,7 @@ endef
 all: header $(NAME) $(NAME_STD)
 
 debug: header add_flags $(NAME) $(NAME_STD)
+	$(eval CFLAGS = -Wall -Wextra -Werror -std=c++98)
 
 add_flags:
 	$(eval CFLAGS += -g -fsanitize=address,undefined -fno-omit-frame-pointer)
@@ -190,6 +182,11 @@ $(NAME_STD): $(OBJ_STD)
 
 $(OBJ_PATH)/%.o: %.cpp | $(OBJ_PATH)
 	@$(call run,$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@,$(COMPIL),$(B_CYAN))
+	$(eval F=0)
+
+$(OBJ_PATH)/%_std.o: %.cpp | $(OBJ_PATH)
+	@$(call run,$(CC) $(CFLAGS) $(CPPFLAGS) -D STD -c $< -o $@\
+		,$(COMPIL),$(B_CYAN))
 	$(eval F=0)
 
 $(OBJ_PATH):

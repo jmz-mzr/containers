@@ -1,10 +1,21 @@
 #include <iostream>
 #include <list>
+#include <algorithm>
 #include "equal.hpp"
 
-#define HEADER1		"*****************************************************\n*"
-#define HEADER2		"*\n*****************************************************\n"
-#define SPACE15		"               "
+#ifndef STD
+# define NMSP	ft
+#else
+# define NMSP	std
+#endif
+
+/******************************************************************************/
+/*                            TEMPLATES / FUNCTIONS                           */
+/******************************************************************************/
+
+/*
+** Functors should be valid binary predicates to the equal function
+*/
 
 template <typename T1, typename T2>
 struct	isEqualFunctor {
@@ -25,21 +36,22 @@ bool	isEqual(int a, int b)
 
 bool	isPalindrome(const std::string& str)
 {
-	if (ft::equal(str.begin(), str.begin() + (str.size() / 2), str.rbegin()))
+	if (NMSP::equal(str.begin(), str.begin() + (str.size() / 2), str.rbegin()))
 		return (true);
-	if (!ft::equal(str.begin(), str.begin() + (str.size() / 2), str.rbegin(),
+	if (!NMSP::equal(str.begin(), str.begin() + (str.size() / 2), str.rbegin(),
 				isEqualFunctor<int, char>()))
 		return (false);
 	return (42);
 }
 
+/******************************************************************************/
+/*                                   TESTS                                    */
+/******************************************************************************/
+
 void	equal__tests(void)
 {
 	long			array[10] = {0, 2, 4, 6, 8, 10, 12};
 	std::list<int>	list(array, array + 7);
-
-	std::cout << HEADER1 << SPACE15 << "        EQUAL        "
-		<< SPACE15 << HEADER2 << std::endl;
 
 	std::cout << std::boolalpha;
 	std::cout << "array<long>[10] =";
@@ -49,17 +61,17 @@ void	equal__tests(void)
 	for (std::list<int>::iterator it = list.begin(); it != list.end(); ++it)
 		std::cout << " " << *it;
 	std::cout << "\n   equal(array, array + 7, list.begin()): "
-		<< ft::equal(array, array + 7, list.begin()) << std::endl;
+		<< NMSP::equal(array, array + 7, list.begin()) << std::endl;
 	list.reverse();
 	std::cout << "list.reverse();\n"
 		"   equal(array, array + 7, list.rbegin(), isEqual): "
-		<< ft::equal(array, array + 7, list.rbegin(), isEqual) << std::endl;
+		<< NMSP::equal(array, array + 7, list.rbegin(), isEqual) << std::endl;
 	list.push_front(14);
 	std::cout << "list.push_front(14);\n"
 		"   equal(array, array + 7, list.rbegin()): "
-		<< ft::equal(array, array + 7, list.rbegin())
+		<< NMSP::equal(array, array + 7, list.rbegin())
 		<< "\n   equal(array, array + 8, list.rbegin()): "
-		<< ft::equal(array, array + 8, list.rbegin()) << "\n" << std::endl;
+		<< NMSP::equal(array, array + 8, list.rbegin()) << "\n" << std::endl;
 
 	std::cout << "\"level\" is a palindrome: ";
 	std::cout << isPalindrome("level") << std::endl;
