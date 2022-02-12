@@ -6,7 +6,7 @@
 #    By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/05 20:03:04 by jmazoyer          #+#    #+#              #
-#    Updated: 2022/02/11 11:47:15 by jmazoyer         ###   ########.fr        #
+#    Updated: 2022/02/18 18:51:24 by jmazoyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,7 +46,8 @@ SRC_NAME		=	main.cpp							\
 					pair__tests.cpp						\
 					make_pair__tests.cpp				\
 					iterator_traits__tests.cpp			\
-					reverse_iterator__tests.cpp
+					reverse_iterator__tests.cpp			\
+					vector__tests.cpp
 
 OBJ_PATH		= objs
 OBJ				= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=.o))

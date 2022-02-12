@@ -38,5 +38,7 @@ int	main(void)
 	iterator_traits__tests();
 	printHeader("REVERSE_ITERATOR");
 	reverse_iterator__tests();
+	printHeader("VECTOR");
+	vector__tests();
 	return (0);
 }
