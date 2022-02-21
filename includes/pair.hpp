@@ -13,21 +13,9 @@ namespace	ft
 		template <typename U1, typename U2>
 		pair(const pair<U1, U2>& p): first(p.first), second(p.second) { }
 
-		pair&	operator=(const pair& rhs);
-
 		T1		first;
 		T2		second;
 	};
-
-	template <typename T1, typename T2>
-	pair<T1, T2>&	pair<T1, T2>::operator=(const pair& rhs)
-	{
-		if (this != &rhs) {
-			first = rhs.first;
-			second = rhs.second;
-		}
-		return (*this);
-	}
 
 	template <typename T1, typename T2>
 	bool	operator==(const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
