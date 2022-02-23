@@ -72,6 +72,15 @@ public:
 	}
 };
 
+class	Heavy {
+public:
+	Heavy(void): str(10000, '-'), strVec(3000, str) { }
+	Heavy(char c): str(10000, c), strVec(3000, str) { }
+private:
+	std::string					str;
+	NMSP::vector<std::string>	strVec;
+};
+
 /******************************************************************************/
 /*                                   TESTS                                    */
 /******************************************************************************/
@@ -120,9 +129,12 @@ void	constructors_destructors__tests(void)
 	std::istream_iterator<std::string>	firstStr(iStr);
 	std::istream_iterator<std::string>	lastStr;
 	NMSP::vector<std::string>			vec5(firstStr, lastStr);
+	size_t								offset = vec4.max_size()
+													- (long)&vec4[0] + 1;
 	try {
-		NMSP::vector<char>				vec6((long)&vec4[0], (long)&vec4[13]);
-	} catch (const std::bad_alloc& e) {
+		NMSP::vector<char>				vec6((long)&vec4[0] + offset,
+												(long)&vec4[13]);
+	} catch (const std::length_error& e) {
 		std::cout << "* Exception: " << e.what() << std::endl;
 	}
 
@@ -243,12 +255,18 @@ void	capacity__tests(void)
 	const NMSP::vector<int>	vec0;
 	NMSP::vector<int>		vec1(2, 1);
 	const NMSP::vector<int>	vec2(5, 2);
+	NMSP::vector<int>		vec3(vec0);
 
 	std::cout << "vec0 = "; if (vec0.empty()) std::cout << "(empty)";
 	std::cout << std::endl;
 	std::cout << "vec1 ="; if (!vec1.empty()) print(vec1);
 	std::cout << "vec2 ="; if (vec2.size() == 5) print(vec2);
+	std::cout << "vec3 = "; if (vec3.empty()) std::cout << "(empty)\n";
 	std::cout << std::endl;
+
+	std::cout << "vec3.capacity() = " << vec3.capacity() << std::endl;
+	std::cout << "vec3.reserve(0);" << std::endl; vec3.reserve(0);
+	std::cout << "vec3.capacity() = " << vec3.capacity() << "\n" << std::endl;
 
 	std::cout << "vec0.max_size() = " << vec0.max_size() << std::endl;
 	std::cout << "vec0.capacity() = " << vec0.capacity() << std::endl;
@@ -256,9 +274,14 @@ void	capacity__tests(void)
 	std::cout << "vec1.reserve(LONG_MAX): "; try { vec1.reserve(LONG_MAX);
 	} catch (const std::length_error& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
+	std::cout << "vec1 ="; print(vec1);
+	std::cout << "vec1.resize(LONG_MAX): "; try { vec1.resize(LONG_MAX);
+	} catch (const std::length_error& e) { std::cout << "* Exception: "
+		<< e.what() << std::endl; }
 	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
 
 	std::cout << "vec1.reserve(2);" << std::endl; vec1.reserve(2);
+	std::cout << "vec1.reserve(0);" << std::endl; vec1.reserve(0);
 	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
 	std::cout << "vec1.resize(2, -1);" << std::endl; vec1.resize(2, -1);
 	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
@@ -278,6 +301,215 @@ void	capacity__tests(void)
 	std::cout << std::endl;
 }
 
+void	element_access__tests(void)
+{
+	const NMSP::vector<int>	vec0;
+	const NMSP::vector<int>	vec1(1, 1);
+	NMSP::vector<int>		vec2(2, 2);
+
+	vec2[1] = 3;
+	std::cout << "vec0 ="; print(vec0);
+	std::cout << "vec1 ="; print(vec1);
+	std::cout << "vec2 ="; print(vec2); std::cout << std::endl;
+
+//	std::cout << "vec0.front = " << vec0.front() << std::endl;	// Should crash!
+	std::cout << "vec1.front = " << vec1.front() << std::endl;
+	std::cout << "vec2.front = " << vec2.front() << std::endl;
+	std::cout << "vec1.back = " << vec1.back() << std::endl;
+	std::cout << "vec2.back = " << vec2.back() << std::endl;
+	std::cout << "vec0.at(0): "; try { std::cout << vec0.at(0) << std::endl;
+	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
+		<< e.what() << std::endl; }
+	std::cout << "vec1.at(0): "; try { std::cout << vec1.at(0) << std::endl;
+	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
+		<< e.what() << std::endl; }
+	std::cout << "vec1.at(1): "; try { std::cout << vec1.at(1) << std::endl;
+	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
+		<< e.what() << std::endl; }
+	std::cout << "vec2.at(-1): "; try { std::cout << vec2.at(-1) << std::endl;
+	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
+		<< e.what() << std::endl; }
+	std::cout << "vec2.at(2): "; try { std::cout << vec2.at(2) << std::endl;
+	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
+		<< e.what() << std::endl; }
+	std::cout << std::endl << std::boolalpha
+		<< "vec1.get_allocator() == vec2.get_allocator(): "
+		<< (vec1.get_allocator() == vec2.get_allocator())
+		<< std::noboolalpha << std::endl << std::endl;
+}
+
+void	modifiers__tests(void)
+{
+	NMSP::vector<int>			vec0;
+	NMSP::vector<int>			vec1(1, 1);
+	NMSP::vector<int>			vec2(2, 2);
+	int							array[7] = {1, 2, 3, 4, 5, 6, 7};
+	std::istringstream			iStr("3 3 3");
+	std::istream_iterator<int>	firstInt(iStr);
+	std::istream_iterator<int>	lastInt;
+	size_t						offset = vec2.max_size() - (long)&vec2[0] + 1;
+
+	std::cout << "vec0 ="; print(vec0);
+	std::cout << "vec1 ="; print(vec1);
+	std::cout << "vec2 ="; print(vec2);
+	std::cout << "array[7] ="; print(NMSP::vector<int>(array, array + 7));
+	std::cout << "iStr = 3 3 3" << std::endl << std::endl;
+
+	std::cout << "vec0.assign(iStr.first, iStr.last);" << std::endl;
+	vec0.assign(firstInt, lastInt);
+	std::cout << "vec0 ="; print(vec0);
+	try { vec0.assign((long)&vec2[0] + offset, (long)&vec2[2] + offset);
+	} catch (const std::length_error& e) { 
+		std::cout << "* Exception: " << e.what() << std::endl; }
+	std::cout << "vec0 ="; print(vec0); std::cout << std::endl;
+
+	std::cout << "vec0.assign(0, 1);" << std::endl; vec0.assign(0, 1);
+	std::cout << "vec0 ="; print(vec0);
+	std::cout << "vec0.assign(1, 1);" << std::endl; vec0.assign(1, 1);
+	std::cout << "vec0 ="; print(vec0);
+	std::cout << "vec0.capacity() = " << vec0.capacity() << std::endl;
+	std::cout << "vec0.assign(5, 5);" << std::endl; vec0.assign(5, 5);
+	std::cout << "vec0 ="; print(vec0); std::cout << std::endl;
+
+	std::cout << "vec0.assign(vec1.begin(), vec1.begin());" << std::endl;
+	vec0.assign(vec1.begin(), vec1.begin());
+	std::cout << "vec0 ="; print(vec0);
+	std::cout << "vec0.assign(vec2.begin(), vec2.end());" << std::endl;
+	vec0.assign(vec2.begin(), vec2.end());
+	std::cout << "vec0 ="; print(vec0);
+	std::cout << "vec0.capacity() = " << vec0.capacity() << std::endl;
+	std::cout << "vec0.assign(array, array + 7);" << std::endl;
+	vec0.assign(array, array + 7);
+	std::cout << "vec0 ="; print(vec0); std::cout << std::endl;
+
+	std::cout << "vec0.capacity() = " << vec0.capacity() << std::endl;
+	std::cout << "vec0.push_back(8, 9, 10);" << std::endl;
+	vec0.push_back(8); vec0.push_back(9); vec0.push_back(10);
+	std::cout << "vec0.capacity() = " << vec0.capacity() << std::endl;
+	std::cout << "vec0 ="; print(vec0); std::cout << std::endl;
+
+	std::cout << "vec0.pop_back() x 3;";
+	vec0.pop_back(); vec0.pop_back(); vec0.pop_back(); std::cout << std::endl;
+	std::cout << "vec0.capacity() = " << vec0.capacity() << std::endl;
+	std::cout << "vec0 ="; print(vec0); std::cout << std::endl;
+
+	std::cout << "vec0.insert(vec0.end(), 8);" << std::endl;
+	vec0.insert(vec0.end(), 8);
+	std::cout << "vec0.insert(vec0.begin(), vec0[0]);" << std::endl;
+	vec0.insert(vec0.begin(), vec0[0]);
+	std::cout << "vec0.insert(vec0.begin() + 1, vec0[8]);" << std::endl;
+	vec0.insert(vec0.begin() + 1, vec0[8]);
+	std::cout << "vec0 ="; print(vec0); std::cout << std::endl;
+/*
+	// Undefined behaviour -- it will probably crash!
+	std::cout << "vec0.insert(vec0.begin() - 100, vec0[0]);" << std::endl;
+	vec0.insert(vec0.begin() - 100, vec0[0]);
+	std::cout << "vec0 ="; print(vec0);
+	std::cout << "vec0.insert(vec0.end() + 100, vec0[0]);" << std::endl;
+	vec0.insert(vec0.begin() + 100, vec0[0]);
+	std::cout << "vec0 ="; print(vec0); std::cout << std::endl;
+*/
+	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
+	std::cout << "vec1 ="; print(vec1);
+	std::cout << "*vec1.insert(vec1.begin(), 0) = "
+		<< *vec1.insert(vec1.begin(), 0) << std::endl;
+	std::cout << "*vec1.insert(vec1.end(), 2) = "
+		<< *vec1.insert(vec1.end(), 2) << std::endl;
+	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
+	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
+
+	std::cout << "vec1.insert(vec1.end(), 1, 3);" << std::endl;
+	vec1.insert(vec1.end(), 1, 3);
+	std::cout << "vec1.insert(vec1.begin(), 1, vec1[0]);" << std::endl;
+	vec1.insert(vec1.begin(), 1, vec1[0]);
+	std::cout << "vec1.insert(vec1.end() - 1, 3, vec1[4]);" << std::endl;
+	vec1.insert(vec1.end() - 1, 3, vec1[4]);
+	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
+	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
+/*
+	// Undefined behaviour -- it will probably crash!
+	std::cout << "vec1.insert(vec1.begin() - 100, 50, vec1[0]);" << std::endl;
+	vec0.insert(vec1.begin() - 100, 50, vec1[0]);
+	std::cout << "vec1 ="; print(vec1);
+	std::cout << "vec1.insert(vec1.end() + 100, 50, vec1[0]);" << std::endl;
+	vec0.insert(vec1.begin() + 100, 50, vec1[0]);
+	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
+	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
+*/
+	std::cout << "vec0.insert(vec0.begin() + 2, LONG_MAX, 2);" << std::endl;
+	try { vec0.insert(vec0.begin() + 2, LONG_MAX, 2);
+	} catch (const std::length_error& e) { 
+		std::cout << "* Exception: " << e.what() << "\n" << std::endl; }
+
+	iStr.clear(); iStr.seekg(0); firstInt = iStr; std::cout
+		<< "vec1.insert(vec1.begin() + 2, iStr.first, iStr.last);" << std::endl;
+	vec1.insert(vec1.begin() + 2, firstInt, lastInt);
+	std::cout << "vec1[7] = 4; vec1[10] = 5;" << std::endl;
+	vec1[7] = 4; vec1[10] = 5;
+	iStr.clear(); iStr.seekg(0); firstInt = iStr;
+	std::cout << "vec1.insert(vec1.begin(), firstInt, lastInt);" << std::endl;
+	vec1.insert(vec1.begin(), firstInt, lastInt);
+	iStr.clear(); iStr.seekg(0); firstInt = iStr;
+	std::cout << "vec1.insert(vec1.end(), firstInt, lastInt);" << std::endl;
+	vec1.insert(vec1.end(), firstInt, lastInt);
+	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
+	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
+
+	std::cout << "vec2.capacity() = " << vec2.capacity() << std::endl;
+	std::cout << "vec2 ="; print(vec2); std::cout << std::endl;
+	std::cout << "vec2.insert(vec2.end() - 1, array, array + 1);" << std::endl;
+	vec2.insert(vec2.end() - 1, array, array + 1);
+	std::cout << "vec2.insert(vec2.end(), array, array + 2);" << std::endl;
+	vec2.insert(vec2.end(), array, array + 2);
+	std::cout << "vec2.insert(vec2.begin(), array, array + 3);" << std::endl;
+	vec2.insert(vec2.begin(), array, array + 3);
+	std::cout << "vec2.insert(vec2.end(), array + 2, array + 4);" << std::endl;
+	vec2.insert(vec2.end(), array + 2, array + 4);
+	std::cout << "vec2.capacity() = " << vec2.capacity() << std::endl;
+	std::cout << "vec2 ="; print(vec2); std::cout << std::endl;
+
+	std::cout << "vec2.insert(vec2.end(), array + 5, array);" << std::endl;
+	vec2.insert(vec2.end(), array + 5, array);	// Undefined behaviour
+	std::cout << "vec2 ="; print(vec2); std::cout << std::endl;
+
+	std::cout << "*vec2.erase(vec2.begin()) = "
+		<< *vec2.erase(vec2.begin()) << std::endl;
+	std::cout << "*vec2.erase(vec2.begin() + 1) = "
+		<< *vec2.erase(vec2.begin() + 1) << std::endl;
+	std::cout << "vec2.erase(vec2.end() - 1) = ";
+	if (vec2.erase(vec2.end() - 1) == vec2.end())
+		std::cout << "vec2.end()" << std::endl;
+	std::cout << "*vec2.erase(vec2.begin(), vec2.begin()) = "
+		<< *vec2.erase(vec2.begin(), vec2.begin()) << std::endl;
+	std::cout << "*vec2.erase(vec2.begin() + 1, vec2.begin() + 2) = "
+		<< *vec2.erase(vec2.begin() + 1, vec2.begin() + 2) << std::endl;
+	std::cout << "vec2.erase(vec2.end(), vec2.end()) = ";
+	if (vec2.erase(vec2.end(), vec2.end()) == vec2.end())
+		std::cout << "vec2.end()" << std::endl;
+	std::cout << "vec2.erase(vec2.end() - 1, vec2.end()) = ";
+	if (vec2.erase(vec2.end() - 1, vec2.end()) == vec2.end())
+		std::cout << "vec2.end()" << std::endl;
+	std::cout << "vec2.erase(vec2.begin(), vec2.end()) = ";
+	if (vec2.erase(vec2.begin(), vec2.end()) == vec2.end())
+		std::cout << "vec2.end()" << std::endl;
+	std::cout << "vec2.capacity() = " << vec2.capacity() << std::endl;
+	std::cout << "vec2 ="; print(vec2); std::cout << std::endl;
+}
+
+void	speed__tests(void)
+{
+	NMSP::vector<Heavy>		vec1(100);
+	NMSP::vector<Heavy>		vec2;
+	Heavy					heavy('+');
+
+	vec2.assign(vec1.begin(), vec1.end());
+	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
+	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
+	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
+	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
+	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
+}
+
 void	vector__tests(void)
 {
 	typedef__tests();
@@ -294,5 +526,10 @@ void	vector__tests(void)
 	std::cout << "   All iterators work correctly\n" << std::endl;
 	capacity__tests();
 	std::cout << "   All capacity functions work correctly\n" << std::endl;
+	element_access__tests();
+	std::cout << "   All element access functions work correctly\n" << std::endl;
+	modifiers__tests();
+	std::cout << "   All modifier functions work correctly\n" << std::endl;
 //	speed__tests();
+//	std::cout << "   Speed test is done\n" << std::endl;
 }

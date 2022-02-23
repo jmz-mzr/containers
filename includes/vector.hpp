@@ -38,7 +38,9 @@ namespace	ft
 						const Allocator& alloc = Allocator());
 		template <typename InputIt>
 		vector(InputIt first, InputIt last,
-				const Allocator& alloc = Allocator());
+				const Allocator& alloc = Allocator(),
+				typename ft::enable_if<!ft::is_integral<
+				InputIt>::value, void*>::type = NULL);
 		vector(const vector& src);
 		~vector(void);
 
@@ -80,13 +82,15 @@ namespace	ft
 
 		void			assign(size_type n, const T& value);
 		template <typename InputIt>
-		void			assign(InputIt first, InputIt last);
+		typename ft::enable_if<!ft::is_integral<InputIt>::value, void>::type
+						assign(InputIt first, InputIt last);
 		void			push_back(const T& value);
-		void			pop_back(void) { destruct_at_end(_end - 1); }	// protect si vec vide ?
+		void			pop_back(void) { destruct_at_end(_end - 1); }
 		iterator		insert(iterator pos, const T& value);
 		void			insert(iterator pos, size_type n, const T& value);
 		template <typename InputIt>
-		void			insert(iterator pos, InputIt first, InputIt last);
+		typename ft::enable_if<!ft::is_integral<InputIt>::value, void>::type
+						insert(iterator pos, InputIt first, InputIt last);
 		void			swap(vector& other);
 		iterator		erase(iterator pos);
 		iterator		erase(iterator first, iterator last);
@@ -94,23 +98,20 @@ namespace	ft
 
 		Allocator		get_allocator(void) const { return (_alloc); }
 	private:
-		void			initialize(size_type n, const T& value);
-		template <typename InputIt>
-		typename ft::enable_if<!ft::is_integral<InputIt>::value, void>::type
-						initialize(InputIt first, InputIt last);
 		void			allocate(size_type n);
 		void			deallocate(void);
 		void			reallocate(size_type new_size);
 		pointer			reallocate(size_type new_size, pointer insert_pos,
 									const T& value, size_type n = 1);
 		template <typename ForwardIt>
-		void			reallocate(size_type new_size, pointer insert_pos,
+		typename ft::enable_if<!ft::is_integral<ForwardIt>::value, void>::type
+						reallocate(size_type new_size, pointer insert_pos,
 									ForwardIt first, ForwardIt last);
 		size_type		optimal_size(size_type new_size) const;
 		void			construct_at_end(size_type n, const T& value);
 		template <typename Iter>
-		//typename ft::enable_if<!ft::is_integral<Iter>::value, void>::type
-		void			construct_at_end(Iter first, Iter last);
+		typename ft::enable_if<!ft::is_integral<Iter>::value, void>::type
+						construct_at_end(Iter first, Iter last);
 		template <typename ForwardIt>
 		void			construct_at_end(ForwardIt first, ForwardIt last,
 											std::forward_iterator_tag);
@@ -144,8 +145,6 @@ namespace	ft
 						_alloc(alloc), _begin(NULL), _end(NULL), _limit(NULL)
 	{
 		if (n > 0) {
-			if (n > max_size())
-				throw std::length_error(LENGTH_ERR);
 			allocate(n);
 			construct_at_end(n, value);
 		}
@@ -153,10 +152,12 @@ namespace	ft
 
 	template <typename T, class Alloc>
 	template <typename InputIt>
-	vector<T, Alloc>::vector(InputIt first, InputIt last, const Alloc& alloc):
+	vector<T, Alloc>::vector(InputIt first, InputIt last, const Alloc& alloc,
+		typename ft::enable_if<!ft::is_integral<InputIt>::value, void*>::type):
 						_alloc(alloc), _begin(NULL), _end(NULL), _limit(NULL)
 	{
-		initialize(first, last);
+		for ( ; first != last; ++first)
+			push_back(*first);
 	}
 
 	template <typename T, class Alloc>
@@ -198,31 +199,12 @@ namespace	ft
 	/*                            MEMBER FUNCTIONS                            */
 	/**************************************************************************/
 
-	template <typename T, class Alloc>
-	void	vector<T, Alloc>::initialize(size_type n, const T& value)
-	{
-		if (n > 0) {
-			if (n > max_size())
-				throw std::length_error(LENGTH_ERR);
-			allocate(n);
-			construct_at_end(n, value);
-		}
-	}
-	template <typename T, class Alloc>
-	template <typename InputIt>
-	typename ft::enable_if<!ft::is_integral<InputIt>::value, void>::type
-		vector<T, Alloc>::initialize(InputIt first, InputIt last)
-	{
-		for ( ; first != last; ++first)
-			push_back(*first);
-	}
-
 	// try toutes les alloc et tout free si catch ?
 	template <typename T, class Alloc>
 	void	vector<T, Alloc>::allocate(size_type n)
 	{
-//		if (n > max_size())		// test
-//			throw std::length_error(LENGTH_ERR);	// qui peut/doit throw ?
+		if (n > max_size())	
+			throw std::length_error(LENGTH_ERR);
 		_begin = _alloc.allocate(n);
 		_end = _begin;
 		_limit = _begin + n;
@@ -244,8 +226,14 @@ namespace	ft
 	void	vector<T, Alloc>::reallocate(size_type new_size)
 	{
 		pointer		new_begin = _alloc.allocate(new_size);
-		pointer		new_end = std::uninitialized_copy(_begin, _end, new_begin); // protect tous les uninitialized_copy/fill ?
+		pointer		new_end = NULL;
 
+		try {
+			new_end = std::uninitialized_copy(_begin, _end, new_begin);
+		} catch (...) {
+			_alloc.deallocate(new_begin, new_size);
+			throw ;
+		}
 		deallocate();
 		_begin = new_begin;
 		_end = new_end;
@@ -257,12 +245,21 @@ namespace	ft
 										const T& value, size_type n)
 	{
 		pointer		new_begin = _alloc.allocate(new_size);
-		pointer		new_pos = std::uninitialized_copy(_begin, insert_pos,
-														new_begin);	// test pos 0 et _end
-		pointer		new_end = std::uninitialized_copy(insert_pos, _end,
-														new_pos + n);
+		pointer		new_pos = NULL;
+		pointer		new_end = NULL;
 
-		std::uninitialized_fill(new_pos, new_pos + n, value);
+		try {
+			new_pos = std::uninitialized_copy(_begin, insert_pos, new_begin);
+			new_end = std::uninitialized_copy(insert_pos, _end, new_pos + n);
+			std::uninitialized_fill(new_pos, new_pos + n, value);
+		} catch (...) {
+			while (new_pos && new_pos != new_begin)
+				_alloc.destroy(--new_pos);
+			while (new_end && new_end != new_pos + n)
+				_alloc.destroy(--new_end);
+			_alloc.deallocate(new_begin, new_size);
+			throw ;
+		}
 		deallocate();
 		_begin = new_begin;
 		_end = new_end;
@@ -270,16 +267,27 @@ namespace	ft
 		return (new_pos);
 	}
 	template <typename T, class Alloc>
-	template <typename ForwardIt>	// protect si is_integral ?
-	void	vector<T, Alloc>::reallocate(size_type new_size, pointer insert_pos,
+	template <typename ForwardIt>
+	typename ft::enable_if<!ft::is_integral<ForwardIt>::value, void>::type
+		vector<T, Alloc>::reallocate(size_type new_size, pointer insert_pos,
 											ForwardIt first, ForwardIt last)
 	{
 		pointer		new_begin = _alloc.allocate(new_size);
-		pointer		new_pos = std::uninitialized_copy(_begin, insert_pos,
-														new_begin);	// test pos 0 et _end
-		pointer		new_end = std::uninitialized_copy(first, last, new_pos);
+		pointer		new_pos = NULL;
+		pointer		new_end = NULL;
 
-		new_end = std::uninitialized_copy(insert_pos, _end, new_end);
+		try {
+			new_pos = std::uninitialized_copy(_begin, insert_pos, new_begin);
+			new_end = std::uninitialized_copy(first, last, new_pos);
+			new_end = std::uninitialized_copy(insert_pos, _end, new_end);
+		} catch (...) {
+			while (new_pos && new_pos != new_begin)
+				_alloc.destroy(--new_pos);
+			while (new_end && new_end != new_pos)
+				_alloc.destroy(--new_end);
+			_alloc.deallocate(new_begin, new_size);
+			throw ;
+		}
 		deallocate();
 		_begin = new_begin;
 		_end = new_end;
@@ -301,13 +309,20 @@ namespace	ft
 			reallocate(optimal_size(n), _end, value, n - size);
 	}
 
+	/*
+	** Up until recently, libc++ did not correctly implemented the standard
+	** for the "std::vector<T>::reserve" function and did not throw the
+	** "std::length_error" exception when "n > max_size()" but instead
+	** propagated the exception thrown from "allocator<T>::allocate"
+	** This behaviour is reproduced to conform to the subject
+	*/
 	template <typename T, class Alloc>
 	void	vector<T, Alloc>::reserve(size_type n)
 	{
-//		if (n > max_size())	// not thrown here in clang++, but in _alloc.allocator
-//			throw std::length_error(LENGTH_ERR);
+	//	if (n > max_size())
+	//		throw std::length_error(LENGTH_ERR);
 		if (n > capacity())
-			reallocate(optimal_size(n));
+			reallocate(n);
 	}
 
 	template <typename T, class Alloc>
@@ -324,8 +339,8 @@ namespace	ft
 		const size_type		max_size = this->max_size();
 		const size_type		capacity = this->capacity();
 
-//		if (new_size > max_size)	// test
-//			throw std::length_error(LENGTH_ERR);	// qui peut/doit throw ?
+		if (new_size > max_size)
+			throw std::length_error(LENGTH_ERR);
 		if (capacity >= max_size / 2)
 			return (max_size);
 		return (std::max(2 * capacity, new_size));
@@ -334,7 +349,6 @@ namespace	ft
 	template <typename T, class Alloc>
 	void	vector<T, Alloc>::construct_at_end(size_type n, const T& value)
 	{
-//		std::cout << "n = " << n << std::endl;
 		while (n > 0) {
 			_alloc.construct(_end, value);
 			++_end;
@@ -342,24 +356,22 @@ namespace	ft
 		}
 	}
 	template <typename T, class Alloc>
-	template <typename ForwardIt>	// protect si is_integral ?
+	template <typename ForwardIt>
 	void	vector<T, Alloc>::construct_at_end(ForwardIt first, ForwardIt last,
 												std::forward_iterator_tag)
 	{
-//		std::cout << "firstForward = " << first << std::endl;
 		for ( ; first != last; ++first) {
 			_alloc.construct(_end, *first);
 			++_end;
 		}
 	}
 	template <typename T, class Alloc>
-	template <typename Iter>	// protect si is_integral ?
-//	typename ft::enable_if<!ft::is_integral<Iter>::value, void>::type
-	void	vector<T, Alloc>::construct_at_end(Iter first, Iter last)
+	template <typename Iter>
+	typename ft::enable_if<!ft::is_integral<Iter>::value, void>::type
+		vector<T, Alloc>::construct_at_end(Iter first, Iter last)
 	{
-//		std::cout << "firstIter = " << first << std::endl;
 		construct_at_end(first, last,
-				typename ft::iterator_traits<Iter>::iterator_category());	// test
+				typename ft::iterator_traits<Iter>::iterator_category());
 	}
 
 	template <typename T, class Alloc>
@@ -407,7 +419,7 @@ namespace	ft
 	template <typename T, class Alloc>
 	template <typename InputIt>
 	void	vector<T, Alloc>::assign(InputIt first, InputIt last,
-										std::input_iterator_tag)	// protect si is_integral ?
+										std::input_iterator_tag)
 	{
 		clear();
 		for ( ; first != last; ++first)
@@ -443,10 +455,11 @@ namespace	ft
 	}
 	template <typename T, class Alloc>
 	template <typename InputIt>
-	void	vector<T, Alloc>::assign(InputIt first, InputIt last)
+	typename ft::enable_if<!ft::is_integral<InputIt>::value, void>::type
+		vector<T, Alloc>::assign(InputIt first, InputIt last)
 	{
 		assign(first, last,
-				typename ft::iterator_traits<InputIt>::iterator_category());	// test
+				typename ft::iterator_traits<InputIt>::iterator_category());
 	}
 
 	template <typename T, class Alloc>
@@ -463,37 +476,29 @@ namespace	ft
 											pointer to)
 	{
 		pointer				old_end = _end;
-		difference_type		constructed = _end - to;	// protect pour pas < 0 ?
+		difference_type		constructed = _end - to;
 
-		for (pointer current = first + constructed; current != last;
+		for (pointer current = first + constructed; current < last;
 				++current, ++_end)
 			_alloc.construct(_end, *current);
 		std::copy_backward(first, first + constructed, old_end);
 	}
 
-	// test si _begin <= pos <= _end dans vecteur pour les insert ?
-	// via std::less, etc ?
-	// check test avec pos > _end < _limit, etc
-	// try catch et re-throw en cas d'exception ?
-	// et check strong exception guarantee
 	template <typename T, class Alloc>
 	typename vector<T, Alloc>::iterator
 		vector<T, Alloc>::insert(iterator pos, const T& value)
 	{
-//		T				to_insert;
-		const_pointer	value_ptr = &value;	// test implicite a ce moment la ?
+		const_pointer	value_ptr = &value;
 
 		if (_end < _limit) {
 			if (pos == _end) {
 				_alloc.construct(_end, value);
 				++_end;
 			} else {
-//				to_insert = value;
 				advance_range(pos, _end, pos + 1);
-				if (pos <= value_ptr && value_ptr < _end)	// test avec valeur dans range
+				if (pos <= value_ptr && value_ptr < _end)
 					++value_ptr;
 				*pos = *value_ptr;
-//				*pos = to_insert;
 			}
 		} else
 			pos = reallocate(optimal_size(size() + 1), pos, value);
@@ -502,25 +507,22 @@ namespace	ft
 	template <typename T, class Alloc>
 	void	vector<T, Alloc>::insert(iterator pos, size_type n, const T& value)
 	{
-//		T				to_insert;
 		size_type		constructed = static_cast<size_type>(_end - pos);
-		const_pointer	old_end = _end;
+		pointer			old_end = _end;
 		size_type		old_n = n;
 		const_pointer	value_ptr = &value;
 
 		if (n > 0) {
-			if (static_cast<size_type>(_limit - _end) >= n) {	// test
+			if (static_cast<size_type>(_limit - _end) >= n) {
 				if (constructed < n) {
 					construct_at_end(n - constructed, value);
 					n = constructed;
 				}
 				if (n > 0) {
-//					to_insert = value;
 					advance_range(pos, old_end, pos + old_n);
-					if (pos <= value_ptr && value_ptr < _end)	// test avec valeur dans range
+					if (pos <= value_ptr && value_ptr < _end)
 						value_ptr += old_n;
 					std::fill_n(pos, n, *value_ptr);
-//					std::fill_n(pos, n, to_insert);
 				}
 			} else
 				reallocate(optimal_size(size() + n), pos, value, n);
@@ -550,14 +552,14 @@ namespace	ft
 	void	vector<T, Alloc>::insert(iterator pos, ForwardIt first,
 									ForwardIt last, std::forward_iterator_tag)
 	{
-		size_type		n = std::distance(first, last);
-		size_type		constructed = static_cast<size_type>(_end - pos);
-		ForwardIt		middle = last;
-		const_pointer	old_end = _end;
-		size_type		old_n = n;
+		difference_type		n = std::distance(first, last);
+		difference_type		constructed = _end - pos;
+		ForwardIt			middle = last;
+		pointer				old_end = _end;
+		difference_type		old_n = n;
 
 		if (n > 0) {
-			if (static_cast<size_type>(_limit - _end) >= n) {	// test
+			if ((_limit - _end) >= n) {
 				if (constructed < n) {
 					middle = first;
 					std::advance(middle, constructed);
@@ -573,11 +575,12 @@ namespace	ft
 		}
 	}
 	template <typename T, class Alloc>
-	template <typename InputIt>	// protect si is_integral ?
-	void	vector<T, Alloc>::insert(iterator pos, InputIt first, InputIt last)
+	template <typename InputIt>
+	typename ft::enable_if<!ft::is_integral<InputIt>::value, void>::type
+		vector<T, Alloc>::insert(iterator pos, InputIt first, InputIt last)
 	{
 		insert(pos, first, last,
-				typename ft::iterator_traits<InputIt>::category());
+				typename ft::iterator_traits<InputIt>::iterator_category());
 	}
 
 	template <typename T, class Alloc>
