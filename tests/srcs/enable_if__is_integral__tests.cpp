@@ -77,7 +77,7 @@ void	enable_if__is_integral__tests(void)
 	std::cout << "isOdd(int(2): " << isOdd(int(2)) << std::endl;
 	std::cout << "isEven(long(2): " << isEven(long(2)) << "\n" << std::endl;
 //	std::cout << isOdd(float(2)) << std::endl; // Shouldn't compile!
-//	std::cout << isEven((double(2)) << std::endl; // Shouldn't compile!
+//	std::cout << isEven(double(2)) << std::endl; // Shouldn't compile!
 	std::cout << std::noboolalpha;
 
 	std::cout << "char "; cmpToInt<char>();
