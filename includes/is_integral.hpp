@@ -47,12 +47,6 @@ namespace	ft
 	struct	is_integral_base<unsigned char>: public true_type {
 	};
 	template <>
-	struct	is_integral_base<char16_t>: public true_type {
-	};
-	template <>
-	struct	is_integral_base<char32_t>: public true_type {
-	};
-	template <>
 	struct	is_integral_base<wchar_t>: public true_type {
 	};
 	template <>

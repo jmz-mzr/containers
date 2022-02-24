@@ -1,5 +1,11 @@
 #include <iostream>
-#include <type_traits>
+#ifdef __cplusplus
+# if __cplusplus >= 201103L
+#  include <type_traits>
+# elif defined(STD)
+#  undef STD
+# endif
+#endif
 #include "enable_if.hpp"
 #include "is_integral.hpp"
 
