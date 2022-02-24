@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <type_traits>
 #include <climits>
 #include <exception>
 #include <string>
@@ -89,18 +88,18 @@ void	typedef__tests(void)
 {
 	typedef NMSP::vector<int>									vec;
 	int															x;
-	std::enable_if<true, vec::value_type>::type					a;
-	std::enable_if<true, vec::allocator_type>::type				b;
-	std::enable_if<true, vec::reference>::type					c = x;
-	std::enable_if<true, vec::const_reference>::type			d = x;
-	std::enable_if<true, vec::pointer>::type					e;
-	std::enable_if<true, vec::const_pointer>::type				f;
-	std::enable_if<true, vec::iterator>::type					g;
-	std::enable_if<true, vec::const_iterator>::type				h;
-	std::enable_if<true, vec::reverse_iterator>::type			i;
-	std::enable_if<true, vec::const_reverse_iterator>::type		j;
-	std::enable_if<true, vec::difference_type>::type			k;
-	std::enable_if<true, vec::size_type>::type					l;
+	ft::enable_if<true, vec::value_type>::type					a;
+	ft::enable_if<true, vec::allocator_type>::type				b;
+	ft::enable_if<true, vec::reference>::type					c = x;
+	ft::enable_if<true, vec::const_reference>::type				d = x;
+	ft::enable_if<true, vec::pointer>::type						e;
+	ft::enable_if<true, vec::const_pointer>::type				f;
+	ft::enable_if<true, vec::iterator>::type					g;
+	ft::enable_if<true, vec::const_iterator>::type				h;
+	ft::enable_if<true, vec::reverse_iterator>::type			i;
+	ft::enable_if<true, vec::const_reverse_iterator>::type		j;
+	ft::enable_if<true, vec::difference_type>::type				k;
+	ft::enable_if<true, vec::size_type>::type					l;
 
 	(void)a; (void)b; (void)c; (void)d; (void)e; (void)f; (void)g; (void)h;
 	(void)i; (void)j; (void)k; (void)l;
@@ -110,11 +109,11 @@ void	constructors_destructors__tests(void)
 {
 	try {
 		NMSP::vector<std::string>		vec_2(LONG_MAX, "!");
-	} catch (const std::length_error& e) {
+	} catch (const std::exception& e) {
 		std::cout << "* Exception: " << e.what() << std::endl;
 	} try {
 		NMSP::vector<int>				vec_1(-1, 10);
-	} catch (const std::length_error& e) {
+	} catch (const std::exception& e) {
 		std::cout << "* Exception: " << e.what() << std::endl;
 	}
 	NMSP::vector<int>					vec0(0, 10);
@@ -130,11 +129,12 @@ void	constructors_destructors__tests(void)
 	std::istream_iterator<std::string>	lastStr;
 	NMSP::vector<std::string>			vec5(firstStr, lastStr);
 	size_t								offset = vec4.max_size()
-													- (long)&vec4[0] + 1;
+													- (long)&vec4[0];
 	try {
-		NMSP::vector<char>				vec6((long)&vec4[0] + offset,
+		NMSP::vector<int>				vec6((long)&vec4[0] + offset,
 												(long)&vec4[13]);
-	} catch (const std::length_error& e) {
+		std::cout << "vec6.size() = " << vec6.size() << std::endl;
+	} catch (const std::exception& e) {
 		std::cout << "* Exception: " << e.what() << std::endl;
 	}
 
@@ -271,12 +271,14 @@ void	capacity__tests(void)
 	std::cout << "vec0.max_size() = " << vec0.max_size() << std::endl;
 	std::cout << "vec0.capacity() = " << vec0.capacity() << std::endl;
 	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
-	std::cout << "vec1.reserve(LONG_MAX): "; try { vec1.reserve(LONG_MAX);
-	} catch (const std::length_error& e) { std::cout << "* Exception: "
+	std::cout << "vec1.reserve(vec1.max_size() + 1): ";
+	try { vec1.reserve(vec1.max_size() + 1);
+	} catch (const std::exception& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
 	std::cout << "vec1 ="; print(vec1);
-	std::cout << "vec1.resize(LONG_MAX): "; try { vec1.resize(LONG_MAX);
-	} catch (const std::length_error& e) { std::cout << "* Exception: "
+	std::cout << "vec1.resize(vec1.max_size() + 1): ";
+	try { vec1.resize(vec1.max_size() + 1);
+	} catch (const std::exception& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
 	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
 
@@ -359,7 +361,7 @@ void	modifiers__tests(void)
 	vec0.assign(firstInt, lastInt);
 	std::cout << "vec0 ="; print(vec0);
 	try { vec0.assign((long)&vec2[0] + offset, (long)&vec2[2] + offset);
-	} catch (const std::length_error& e) { 
+	} catch (const std::exception& e) { 
 		std::cout << "* Exception: " << e.what() << std::endl; }
 	std::cout << "vec0 ="; print(vec0); std::cout << std::endl;
 
@@ -425,6 +427,9 @@ void	modifiers__tests(void)
 	std::cout << "vec1.insert(vec1.end() - 1, 3, vec1[4]);" << std::endl;
 	vec1.insert(vec1.end() - 1, 3, vec1[4]);
 	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
+	std::cout << "vec1.insert(vec1.begin() + 1, 1, vec1[0]);" << std::endl;
+	vec1.insert(vec1.begin() + 1, 1, vec1[0]);
+	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
 	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
 /*
 	// Undefined behaviour -- it will probably crash!
@@ -436,9 +441,9 @@ void	modifiers__tests(void)
 	std::cout << "vec1.capacity() = " << vec1.capacity() << std::endl;
 	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
 */
-	std::cout << "vec0.insert(vec0.begin() + 2, LONG_MAX, 2);" << std::endl;
-	try { vec0.insert(vec0.begin() + 2, LONG_MAX, 2);
-	} catch (const std::length_error& e) { 
+	std::cout << "vec0.insert(vec0.begin(), vec0.max_size(), 2);" << std::endl;
+	try { vec0.insert(vec0.begin(), vec0.max_size(), 2);
+	} catch (const std::exception& e) { 
 		std::cout << "* Exception: " << e.what() << "\n" << std::endl; }
 
 	iStr.clear(); iStr.seekg(0); firstInt = iStr; std::cout
@@ -461,17 +466,22 @@ void	modifiers__tests(void)
 	vec2.insert(vec2.end() - 1, array, array + 1);
 	std::cout << "vec2.insert(vec2.end(), array, array + 2);" << std::endl;
 	vec2.insert(vec2.end(), array, array + 2);
+	std::cout << "vec2.capacity() = " << vec2.capacity() << std::endl;
 	std::cout << "vec2.insert(vec2.begin(), array, array + 3);" << std::endl;
 	vec2.insert(vec2.begin(), array, array + 3);
 	std::cout << "vec2.insert(vec2.end(), array + 2, array + 4);" << std::endl;
 	vec2.insert(vec2.end(), array + 2, array + 4);
 	std::cout << "vec2.capacity() = " << vec2.capacity() << std::endl;
+	std::cout << "vec2.insert(vec2.end() - 1, array, array + 1);" << std::endl;
+	vec2.insert(vec2.end() - 1, array, array + 1);
+	std::cout << "vec2.capacity() = " << vec2.capacity() << std::endl;
 	std::cout << "vec2 ="; print(vec2); std::cout << std::endl;
-
+/*
+	// Undefined behaviour
 	std::cout << "vec2.insert(vec2.end(), array + 5, array);" << std::endl;
-	vec2.insert(vec2.end(), array + 5, array);	// Undefined behaviour
+	vec2.insert(vec2.end(), array + 5, array);
 	std::cout << "vec2 ="; print(vec2); std::cout << std::endl;
-
+*/
 	std::cout << "*vec2.erase(vec2.begin()) = "
 		<< *vec2.erase(vec2.begin()) << std::endl;
 	std::cout << "*vec2.erase(vec2.begin() + 1) = "

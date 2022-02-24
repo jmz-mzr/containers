@@ -4,12 +4,26 @@
 # include <memory>
 # include <algorithm>
 # include <stdexcept>
+# include <limits>
+# include <sstream>
 # include "enable_if.hpp"
 # include "is_integral.hpp"
 # include "iterator_traits.hpp"
 # include "reverse_iterator.hpp"
 # include "equal.hpp"
 # include "lexicographical_compare.hpp"
+
+# if (defined(__GLIBCXX__) || defined(__GLIBCPP__))
+#  define MAC			0
+#  define LIBCPP		0
+#  define LINUX			1
+#  define LIBSTDCPP		1
+# else
+#  define MAC			1
+#  define LIBCPP		1
+#  define LINUX			0
+#  define LIBSTDCPP		0
+# endif
 
 # define LENGTH_ERR		"vector"
 # define RANGE_ERR		"vector"
@@ -116,6 +130,7 @@ namespace	ft
 		void			construct_at_end(ForwardIt first, ForwardIt last,
 											std::forward_iterator_tag);
 		void			destruct_at_end(const_pointer new_end);
+		void			range_check(size_type i) const;
 		template <typename InputIt>
 		void			assign(InputIt first, InputIt last,
 								std::input_iterator_tag);
@@ -199,11 +214,10 @@ namespace	ft
 	/*                            MEMBER FUNCTIONS                            */
 	/**************************************************************************/
 
-	// try toutes les alloc et tout free si catch ?
 	template <typename T, class Alloc>
 	void	vector<T, Alloc>::allocate(size_type n)
 	{
-		if (n > max_size())	
+		if (!LINUX && n > max_size())
 			throw std::length_error(LENGTH_ERR);
 		_begin = _alloc.allocate(n);
 		_end = _begin;
@@ -305,6 +319,8 @@ namespace	ft
 			destruct_at_end(_begin + n);
 		else if (n <= capacity())
 			construct_at_end(n - size, value);
+		else if (LINUX && n > max_size())
+			throw std::length_error("vector::_M_fill_insert");
 		else
 			reallocate(optimal_size(n), _end, value, n - size);
 	}
@@ -319,8 +335,8 @@ namespace	ft
 	template <typename T, class Alloc>
 	void	vector<T, Alloc>::reserve(size_type n)
 	{
-	//	if (n > max_size())
-	//		throw std::length_error(LENGTH_ERR);
+		if (LINUX && n > max_size())
+			throw std::length_error("vector::reserve");
 		if (n > capacity())
 			reallocate(n);
 	}
@@ -332,13 +348,26 @@ namespace	ft
 					std::numeric_limits<size_type>::max() / 2));
 	}
 
+	/*
+	** Libc++ expects the "new_size" parameter to be the total new_size
+	** we are looking for, and it returns it optimized, whereas
+	** libstdc++ expects the "new_size" parameter to be the additional
+	** size we need, and it returns an optimized total new_size
+	*/
 	template <typename T, class Alloc>
 	typename vector<T, Alloc>::size_type
 		vector<T, Alloc>::optimal_size(size_type new_size) const
 	{
+		const size_type		size = this->size();
 		const size_type		max_size = this->max_size();
 		const size_type		capacity = this->capacity();
 
+		if (LINUX) {
+			new_size = size + std::max(size, new_size - size);
+			if (new_size < size || new_size > max_size)
+				return (max_size);
+			return (new_size);
+		}
 		if (new_size > max_size)
 			throw std::length_error(LENGTH_ERR);
 		if (capacity >= max_size / 2)
@@ -382,20 +411,32 @@ namespace	ft
 	}
 
 	template <typename T, class Alloc>
+	void	vector<T, Alloc>::range_check(size_type i) const
+	{
+		size_type			size = this->size();
+		std::ostringstream	error;
+
+		if (LINUX && i >= size) {
+			error << "vector::_M_range_check: __n (which is " << i
+				<< ") >= this->size() (which is " << size << ")";
+			throw std::out_of_range(error.str());
+		}
+		else if (i >= size)
+			throw std::out_of_range(RANGE_ERR);
+	}
+
+	template <typename T, class Alloc>
 	typename vector<T, Alloc>::reference
 		vector<T, Alloc>::at(size_type i)
 	{
-		if (i >= size())
-			throw std::out_of_range(RANGE_ERR);
+		range_check(i);
 		return (_begin[i]);
 	}
-
 	template <typename T, class Alloc>
 	typename vector<T, Alloc>::const_reference
 		vector<T, Alloc>::at(size_type i) const
 	{
-		if (i >= size())
-			throw std::out_of_range(RANGE_ERR);
+		range_check(i);
 		return (_begin[i]);
 	}
 
@@ -411,8 +452,12 @@ namespace	ft
 			else
 				destruct_at_end(_begin + n);
 		} else {
-			deallocate();
-			allocate(optimal_size(n));
+			if (!LINUX || n <= max_size())
+				deallocate();
+			if (LINUX)
+				allocate(n);
+			else
+				allocate(optimal_size(n));
 			construct_at_end(n, value);
 		}
 	}
@@ -447,6 +492,9 @@ namespace	ft
 				construct_at_end(middle, last);
 			else
 				destruct_at_end(new_end);
+		} else if (LINUX && new_size > max_size()) {
+			throw std::length_error("cannot create std::vector"
+					"larger than max_size()");
 		} else {
 			deallocate();
 			allocate(optimal_size(new_size));
@@ -465,6 +513,8 @@ namespace	ft
 	template <typename T, class Alloc>
 	void	vector<T, Alloc>::push_back(const T& value)
 	{
+		if (LINUX && size() == max_size())
+			throw std::length_error("_M_realloc_insert");
 		if (_end == _limit)
 			reallocate(optimal_size(size() + 1));
 		_alloc.construct(_end, value);
@@ -500,7 +550,9 @@ namespace	ft
 					++value_ptr;
 				*pos = *value_ptr;
 			}
-		} else
+		} else if (LINUX && size() == max_size())
+			throw std::length_error("_M_realloc_insert");
+		else
 			pos = reallocate(optimal_size(size() + 1), pos, value);
 		return (pos);
 	}
@@ -524,7 +576,9 @@ namespace	ft
 						value_ptr += old_n;
 					std::fill_n(pos, n, *value_ptr);
 				}
-			} else
+			} else if (LINUX && n > (max_size() - size()))
+				throw std::length_error("vector::_M_fill_insert");
+			else
 				reallocate(optimal_size(size() + n), pos, value, n);
 		}
 	}
@@ -570,7 +624,9 @@ namespace	ft
 					advance_range(pos, old_end, pos + old_n);
 					std::copy(first, middle, pos);
 				}
-			} else
+			} else if (LINUX && (size_type)n > (max_size() - size()))
+				throw std::length_error("vector::_M_range_insert");
+			else
 				reallocate(optimal_size(size() + n), pos, first, last);
 		}
 	}
