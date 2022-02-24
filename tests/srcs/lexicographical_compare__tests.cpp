@@ -58,13 +58,15 @@ void	lexicographical_compare__tests(void)
 	std::cout << "lex_cmp(s1.begin(), s1.begin(), s2.end(), s2.end()): "
 		<< NMSP::lexicographical_compare(s1.begin(), s1.begin(),
 				s2.end(), s2.end()) << std::endl;
+/*
+	// Will crash on libstdc++
 	std::cout << "lex_cmp(s1.end() + 10, s1.end(), s2.end(), s2.end()): "
 		<< NMSP::lexicographical_compare(s1.end() + 10, s1.end(),
 				s2.end(), s2.end()) << std::endl;
 	std::cout << "lex_cmp(s1.end(), s1.end(), s2.end() + 10, s2.end()): "
 		<< NMSP::lexicographical_compare(s1.end(), s1.end(),
 				s2.end() + 10, s2.end()) << std::endl << std::endl;
-
+*/
 	std::cout << "lex_cmp(s1.begin(), s1.end(), s2.begin(), s2.end()): "
 		<< NMSP::lexicographical_compare(s1.begin(), s1.end(),
 				s2.begin(), s2.end()) << std::endl;
