@@ -8,6 +8,6 @@ void	pair__tests(void);
 void	make_pair__tests(void);
 void	iterator_traits__tests(void);
 void	reverse_iterator__tests(void);
-void	vector__tests(void);
+void	vector__tests(bool testSpeed);
 
 #endif

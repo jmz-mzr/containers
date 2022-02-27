@@ -22,8 +22,23 @@ void	printHeader(const std::string& str)
 		<< B_CYAN << "*\n" << stars << NO_COLOR << "\n" << std::endl;
 }
 
-int	main(void)
+void	printSuccess(const std::string& flags)
 {
+	std::cout << B_GREEN << "[OK]" << NO_COLOR
+		<< " All tests ran successfully!";
+	if (flags != "-v" && flags != "-a")
+		std::cout << "\nTo compare the \"ft::\" containers' speed with the"
+			" \"std::\" ones, re-run these test with\nthe corresponding flag:"
+			" -v (vector), -... (...), or -a (all)";
+	std::cout << std::endl;
+}
+
+int	main(int argc, char** argv)
+{
+	std::string		flags;
+
+	if (argc > 1)
+		flags = argv[1];
 	printHeader("ENABLE_IF / IS_INTEGRAL");
 	enable_if__is_integral__tests();
 	printHeader("EQUAL");
@@ -39,6 +54,7 @@ int	main(void)
 	printHeader("REVERSE_ITERATOR");
 	reverse_iterator__tests();
 	printHeader("VECTOR");
-	vector__tests();
+	vector__tests(flags == "-v" || flags == "-a");
+	printSuccess(flags);
 	return (0);
 }

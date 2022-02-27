@@ -42,7 +42,7 @@ void	print(const NMSP::vector<char>& vec)
 }
 
 /*
-** Use a custom allocator to test with our vector class
+** Use a custom allocator to test with the ft::vector class
 */
 
 template <typename T>
@@ -70,6 +70,10 @@ public:
 		return (std::allocator<T>::deallocate(p, n));
 	}
 };
+
+/*
+** Build a heavy class to test the performance
+*/
 
 class	Heavy {
 public:
@@ -520,7 +524,7 @@ void	speed__tests(void)
 	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
 }
 
-void	vector__tests(void)
+void	vector__tests(bool testSpeed)
 {
 	typedef__tests();
 	std::cout << "   All typedefs are correctly defined\n" << std::endl;
@@ -540,6 +544,8 @@ void	vector__tests(void)
 	std::cout << "   All element access functions work correctly\n" << std::endl;
 	modifiers__tests();
 	std::cout << "   All modifier functions work correctly\n" << std::endl;
-//	speed__tests();
-//	std::cout << "   Speed test is done\n" << std::endl;
+	if (testSpeed) {
+		speed__tests();
+		std::cout << "   Speed test is done\n" << std::endl;
+	}
 }
