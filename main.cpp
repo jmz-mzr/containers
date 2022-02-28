@@ -29,7 +29,7 @@ void	printSuccess(const std::string& flags)
 	if (flags != "-v" && flags != "-a")
 		std::cout << "\nTo compare the \"ft::\" containers' speed with the"
 			" \"std::\" ones, re-run these test with\nthe corresponding flag:"
-			" -v (vector), -... (...), or -a (all)";
+			" -v (vector), -s (stack), -... (...), or -a (all)";
 	std::cout << std::endl;
 }
 
@@ -55,6 +55,8 @@ int	main(int argc, char** argv)
 	reverse_iterator__tests();
 	printHeader("VECTOR");
 	vector__tests(flags == "-v" || flags == "-a");
+	printHeader("STACK");
+	stack__tests(flags == "-s" || flags == "-a");
 	printSuccess(flags);
 	return (0);
 }
