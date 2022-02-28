@@ -15,6 +15,14 @@
 # define NMSP	std
 #endif
 
+#if MACOS
+# define SPEED_STRLEN		7500
+# define SPEED_VEC_SIZE		3000
+#elif LINUX
+# define SPEED_STRLEN		5000
+# define SPEED_VEC_SIZE		1750
+#endif
+
 /******************************************************************************/
 /*                            TEMPLATES / FUNCTIONS                           */
 /******************************************************************************/
@@ -24,7 +32,7 @@
 */
 
 template <typename T>
-void	print(const NMSP::vector<T>& vec)
+static void	print(const NMSP::vector<T>& vec)
 {
 	for (typename NMSP::vector<T>::const_iterator it = vec.begin();
 			it != vec.end(); ++it)
@@ -73,12 +81,14 @@ public:
 
 /*
 ** Build a heavy class to test the performance
+** (the defined values depend on your machine: here my Linux VM cannot
+** handle the same tests as my native MacOS)
 */
 
 class	Heavy {
 public:
-	Heavy(void): str(10000, '-'), strVec(3000, str) { }
-	Heavy(char c): str(10000, c), strVec(3000, str) { }
+	Heavy(void): str(SPEED_STRLEN, '-'), strVec(SPEED_VEC_SIZE, str) { }
+	Heavy(char c): str(SPEED_STRLEN, c), strVec(SPEED_VEC_SIZE, str) { }
 private:
 	std::string					str;
 	NMSP::vector<std::string>	strVec;
@@ -88,7 +98,7 @@ private:
 /*                                   TESTS                                    */
 /******************************************************************************/
 
-void	typedef__tests(void)
+static void	typedef__tests(void)
 {
 	typedef NMSP::vector<int>									vec;
 	int															x;
@@ -109,7 +119,7 @@ void	typedef__tests(void)
 	(void)i; (void)j; (void)k; (void)l;
 }
 
-void	constructors_destructors__tests(void)
+static void	constructors_destructors__tests(void)
 {
 	try {
 		NMSP::vector<std::string>		vec_2(LONG_MAX, "!");
@@ -151,7 +161,7 @@ void	constructors_destructors__tests(void)
 	std::cout << std::endl;
 }
 
-void	member_operators__tests(void)
+static void	member_operators__tests(void)
 {
 	NMSP::vector<int>		vec0;
 	const NMSP::vector<int>	vec1(2, 1);
@@ -177,7 +187,7 @@ void	member_operators__tests(void)
 	std::cout << std::endl;
 }
 
-void	relational_operators__tests(void)
+static void	relational_operators__tests(void)
 {
 	NMSP::vector<std::string>		vec0;
 	const NMSP::vector<std::string>	vec1(1, "Hi");
@@ -204,7 +214,7 @@ void	relational_operators__tests(void)
 	std::cout << std::endl << std::noboolalpha;
 }
 
-void	swap__tests(void)
+static void	swap__tests(void)
 {
 	NMSP::vector<int>					vec1(2, 1);
 	NMSP::vector<int>					vec2(5, 2);
@@ -237,7 +247,7 @@ void	swap__tests(void)
 	std::cout << std::endl << std::endl;
 }
 
-void	iterators__tests(void)
+static void	iterators__tests(void)
 {
 	NMSP::vector<int>					vec1(3, 1);
 	const NMSP::vector<int>				vec2(5, 2);
@@ -254,7 +264,7 @@ void	iterators__tests(void)
 	std::cout << std::endl << std::endl;
 }
 
-void	capacity__tests(void)
+static void	capacity__tests(void)
 {
 	const NMSP::vector<int>	vec0;
 	NMSP::vector<int>		vec1(2, 1);
@@ -307,7 +317,7 @@ void	capacity__tests(void)
 	std::cout << std::endl;
 }
 
-void	element_access__tests(void)
+static void	element_access__tests(void)
 {
 	const NMSP::vector<int>	vec0;
 	const NMSP::vector<int>	vec1(1, 1);
@@ -344,7 +354,7 @@ void	element_access__tests(void)
 		<< std::noboolalpha << std::endl << std::endl;
 }
 
-void	modifiers__tests(void)
+static void	modifiers__tests(void)
 {
 	NMSP::vector<int>			vec0;
 	NMSP::vector<int>			vec1(1, 1);
@@ -510,7 +520,7 @@ void	modifiers__tests(void)
 	std::cout << "vec2 ="; print(vec2); std::cout << std::endl;
 }
 
-void	speed__tests(void)
+static void	speed__tests(void)
 {
 	NMSP::vector<Heavy>		vec1(100);
 	NMSP::vector<Heavy>		vec2;
