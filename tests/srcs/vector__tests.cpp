@@ -85,10 +85,10 @@ public:
 ** handle the same tests as my native MacOS)
 */
 
-class	Heavy {
+class	HeavyVec {
 public:
-	Heavy(void): str(SPEED_STRLEN, '-'), strVec(SPEED_VEC_SIZE, str) { }
-	Heavy(char c): str(SPEED_STRLEN, c), strVec(SPEED_VEC_SIZE, str) { }
+	HeavyVec(void): str(SPEED_STRLEN, '-'), strVec(SPEED_VEC_SIZE, str) { }
+	HeavyVec(char c): str(SPEED_STRLEN, c), strVec(SPEED_VEC_SIZE, str) { }
 private:
 	std::string					str;
 	NMSP::vector<std::string>	strVec;
@@ -522,9 +522,9 @@ static void	modifiers__tests(void)
 
 static void	speed__tests(void)
 {
-	NMSP::vector<Heavy>		vec1(100);
-	NMSP::vector<Heavy>		vec2;
-	Heavy					heavy('+');
+	NMSP::vector<HeavyVec>		vec1(100);
+	NMSP::vector<HeavyVec>		vec2;
+	HeavyVec					heavy('+');
 
 	vec2.assign(vec1.begin(), vec1.end());
 	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
