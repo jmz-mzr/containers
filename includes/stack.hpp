@@ -17,14 +17,13 @@ namespace	ft
 ** against which the libc++ and libstdc++ implementations aren't protected
 ** (see examples in "hackFtStack.hpp" and "hackStdStack.hpp")
 */
-
-//	template <typename T, class Container>
-//	class	stack;
-//	template <typename T, class Container>
-//	bool	operator==(const stack<T, Container>&, const stack<T, Container>&);
-//	template <typename T, class Container>
-//	bool	operator<(const stack<T, Container>&, const stack<T, Container>&);
-
+/*	template <typename T, class Container>
+	class	stack;
+	template <typename T, class Container>
+	bool	operator==(const stack<T, Container>&, const stack<T, Container>&);
+	template <typename T, class Container>
+	bool	operator<(const stack<T, Container>&, const stack<T, Container>&);
+*/
 	template <typename T, class Container = ft::vector<T> >
 	class	stack {
 	public:

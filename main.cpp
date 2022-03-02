@@ -26,7 +26,7 @@ void	printSuccess(const std::string& flags)
 {
 	std::cout << B_GREEN << "[OK]" << NO_COLOR
 		<< " All tests ran successfully!";
-	if (flags != "-v" && flags != "-a")
+	if (flags != "-v" && flags != "-a" && flags != "-s")
 		std::cout << "\nTo compare the \"ft::\" containers' speed with the"
 			" \"std::\" ones, re-run these test with\nthe corresponding flag:"
 			" -v (vector), -s (stack), -... (...), or -a (all)";

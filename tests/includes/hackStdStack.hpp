@@ -1,7 +1,8 @@
-#ifndef STACK3_HPP
-# define STACK3_HPP
+#ifndef HACKSTDSTACK_HPP
+# define HACKSTDSTACK_HPP
 
 # include <stack>
+# include <vector>
 
 namespace	std
 {

@@ -1,5 +1,5 @@
-#ifndef STACK2_HPP
-# define STACK2_HPP
+#ifndef HACKFTSTACK_HPP
+# define HACKFTSTACK_HPP
 
 # include "stack.hpp"
 
