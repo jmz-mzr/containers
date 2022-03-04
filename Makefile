@@ -6,7 +6,7 @@
 #    By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/05 20:03:04 by jmazoyer          #+#    #+#              #
-#    Updated: 2022/02/28 15:29:42 by jmazoyer         ###   ########.fr        #
+#    Updated: 2022/03/18 18:00:26 by jmazoyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,7 @@
 
 NAME		= ft_containers_tests
 NAME_STD	= ft_containers_tests_std
+NAME_TREE	= _tree_tests
 AUTHOR		= jmazoyer
 
 CC			= clang++
@@ -36,8 +37,7 @@ F			= 1
 INC_PATH		= includes			\
 				  tests/includes
 
-SRC_PATH		= srcs			\
-				  tests/srcs
+SRC_PATH		= tests/srcs
 
 SRC_NAME		=	main.cpp							\
 					enable_if__is_integral__tests.cpp	\
@@ -50,9 +50,13 @@ SRC_NAME		=	main.cpp							\
 					vector__tests.cpp					\
 					stack__tests.cpp
 
+SRC_TREE		=	_tree__tests.cpp
+
 OBJ_PATH		= objs
 OBJ				= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=.o))
 OBJ_STD			= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=_std.o))
+
+OBJ_TREE		= $(addprefix $(OBJ_PATH)/, $(SRC_TREE:.cpp=.o))
 
 DEP				= $(OBJ:.o=.d)
 
@@ -156,6 +160,8 @@ debug: header add_flags $(NAME) $(NAME_STD)
 add_flags:
 	$(eval CFLAGS += -g -fsanitize=address,undefined -fno-omit-frame-pointer)
 
+tree: header $(NAME_TREE)
+
 header:
 	@if [ $(S) -eq 1 ]; then \
 		:; \
@@ -180,6 +186,10 @@ $(NAME): $(OBJ)
 
 $(NAME_STD): $(OBJ_STD)
 	@$(call run,$(CC) $(CFLAGS) $(OBJ_STD) -o $@,$(LINK),$(B_GREEN))
+	$(eval F=1)
+
+$(NAME_TREE): $(OBJ_TREE)
+	@$(call run,$(CC) $(CFLAGS) $(OBJ_TREE) -o $@,$(LINK),$(B_GREEN))
 	$(eval F=1)
 
 $(OBJ_PATH)/%.o: %.cpp | $(OBJ_PATH)

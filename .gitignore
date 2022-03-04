@@ -5,3 +5,4 @@
 *.d
 ft_containers_tests
 ft_containers_tests_std
+_tree_tests
