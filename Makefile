@@ -6,7 +6,7 @@
 #    By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/05 20:03:04 by jmazoyer          #+#    #+#              #
-#    Updated: 2022/03/18 18:00:26 by jmazoyer         ###   ########.fr        #
+#    Updated: 2022/03/19 16:29:43 by jmazoyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -58,7 +58,7 @@ OBJ_STD			= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=_std.o))
 
 OBJ_TREE		= $(addprefix $(OBJ_PATH)/, $(SRC_TREE:.cpp=.o))
 
-DEP				= $(OBJ:.o=.d)
+DEP				= $(OBJ:.o=.d) $(OBJ_STD:.o=.d) $(OBJ_TREE:.o=.d)
 
 VPATH			= $(SRC_PATH)
 

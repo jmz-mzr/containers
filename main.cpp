@@ -1,9 +1,6 @@
 #include <iostream>
+#include "colors.hpp"
 #include "tests.hpp"
-
-#define B_CYAN		"\033[0;96m"
-#define B_GREEN		"\033[0;92m"
-#define NO_COLOR	"\033[m"
 
 void	printHeader(const std::string& str)
 {
