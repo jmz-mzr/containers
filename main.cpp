@@ -2,18 +2,15 @@
 #include "colors.hpp"
 #include "tests.hpp"
 
-void	printHeader(const std::string& str)
+void	printHeader(const std::string& str, bool addNewline = true)
 {
 	int				nbStars = 78 - (str.size() % 2);
 	std::string		stars(nbStars, '*');
 	int				nbSpaces = nbStars - 2 - str.size();
 	std::string		spaces(nbSpaces / 2, ' ');
-	static bool		addNewline = false;
 
 	if (addNewline)
 		std::cout << "\n";
-	else
-		addNewline = true;
 	std::cout << B_CYAN << stars << "\n*"
 		<< NO_COLOR << spaces << B_GREEN << str << NO_COLOR << spaces
 		<< B_CYAN << "*\n" << stars << NO_COLOR << "\n" << std::endl;
@@ -36,7 +33,7 @@ int	main(int argc, char** argv)
 
 	if (argc > 1)
 		flags = argv[1];
-	printHeader("ENABLE_IF / IS_INTEGRAL");
+	printHeader("ENABLE_IF / IS_INTEGRAL", false);
 	enable_if__is_integral__tests();
 	printHeader("EQUAL");
 	equal__tests();
@@ -52,7 +49,7 @@ int	main(int argc, char** argv)
 	reverse_iterator__tests();
 	printHeader("VECTOR");
 	vector__tests(flags == "-v" || flags == "-a");
-	printHeader("STACK");
+	printHeader("STACK", false);
 	stack__tests(flags == "-s" || flags == "-a");
 	printSuccess(flags);
 	return (0);

@@ -7,6 +7,7 @@
 //#include "stack.hpp"
 #include "hackFtStack.hpp"
 #include "enable_if.hpp"
+#include "colors.hpp"
 
 #ifndef STD
 # define NMSP	ft
@@ -25,6 +26,19 @@
 /******************************************************************************/
 /*                            TEMPLATES / FUNCTIONS                           */
 /******************************************************************************/
+
+static std::string	success(const char* str)
+{
+	std::string		output("  All ");
+
+	output += str;
+	output += " work correctly  ";
+	output += B_GREEN;
+	output += "✔︎";
+	output += NO_COLOR;
+	output += "\n";
+	return (output);
+}
 
 /*
 ** Self-explanatory: it prints a stack's content
@@ -189,17 +203,17 @@ static void	speed__tests(void)
 void	stack__tests(bool testSpeed)
 {
 	typedef__tests();
-	std::cout << "   All typedefs are correctly defined\n" << std::endl;
+	std::cout << success("typedefs") << std::endl;
 	constructors_destructors__tests();
-	std::cout << "   All constructors & destructors work correctly\n" << std::endl;
+	std::cout << success("constructors & destructors") << std::endl;
 	member_operators__tests();
-	std::cout << "   All member operators work correctly\n" << std::endl;
+	std::cout << success("member operators") << std::endl;
 	relational_operators__tests();
-	std::cout << "   All relational operators work correctly\n" << std::endl;
+	std::cout << success("relational operators") << std::endl;
 	member_functions__tests();
-	std::cout << "   All member functions work correctly\n" << std::endl;
+	std::cout << success("member functions") << std::endl;
 	if (testSpeed) {
 		speed__tests();
-		std::cout << "   Speed test is done\n" << std::endl;
+		std::cout << success("speed tests") << std::endl;
 	}
 }

@@ -8,6 +8,7 @@
 #include <memory>
 #include <cstdio>
 #include "vector.hpp"
+#include "colors.hpp"
 
 #ifndef STD
 # define NMSP	ft
@@ -26,6 +27,19 @@
 /******************************************************************************/
 /*                            TEMPLATES / FUNCTIONS                           */
 /******************************************************************************/
+
+static std::string	success(const char* str)
+{
+	std::string		output("  All ");
+
+	output += str;
+	output += " work correctly  ";
+	output += B_GREEN;
+	output += "✔︎";
+	output += NO_COLOR;
+	output += "\n";
+	return (output);
+}
 
 /*
 ** Self-explanatory: it prints a vector's content
@@ -537,25 +551,25 @@ static void	speed__tests(void)
 void	vector__tests(bool testSpeed)
 {
 	typedef__tests();
-	std::cout << "   All typedefs are correctly defined\n" << std::endl;
+	std::cout << success("typedefs") << std::endl;
 	constructors_destructors__tests();
-	std::cout << "   All constructors & destructors work correctly\n" << std::endl;
+	std::cout << success("constructors & destructors") << std::endl;
 	member_operators__tests();
-	std::cout << "   All member operators work correctly\n" << std::endl;
+	std::cout << success("member operators") << std::endl;
 	relational_operators__tests();
-	std::cout << "   All relational operators work correctly\n" << std::endl;
+	std::cout << success("relational operators") << std::endl;
 	swap__tests();
-	std::cout << "   All swap functions work correctly\n" << std::endl;
+	std::cout << success("swap functions") << std::endl;
 	iterators__tests();
-	std::cout << "   All iterators work correctly\n" << std::endl;
+	std::cout << success("iterators") << std::endl;
 	capacity__tests();
-	std::cout << "   All capacity functions work correctly\n" << std::endl;
+	std::cout << success("capacity functions") << std::endl;
 	element_access__tests();
-	std::cout << "   All element access functions work correctly\n" << std::endl;
+	std::cout << success("element access functions") << std::endl;
 	modifiers__tests();
-	std::cout << "   All modifier functions work correctly\n" << std::endl;
+	std::cout << success("modifier functions") << std::endl;
 	if (testSpeed) {
 		speed__tests();
-		std::cout << "   Speed test is done\n" << std::endl;
+		std::cout << success("speed tests") << std::endl;
 	}
 }
