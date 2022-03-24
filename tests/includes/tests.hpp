@@ -10,5 +10,6 @@ void	iterator_traits__tests(void);
 void	reverse_iterator__tests(void);
 void	vector__tests(bool testSpeed);
 void	stack__tests(bool testSpeed);
+void	map__tests(bool testSpeed);
 
 #endif
