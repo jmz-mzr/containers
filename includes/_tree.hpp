@@ -58,12 +58,8 @@ namespace	ft
 	{
 		if (node->right)
 			return (_tree_min(node->right));
-//		if (LIBSTDCPP)
 		while (node->parent && !_tree_is_left_child(node))
 			node = node->parent;
-//		else
-//			while (!_tree_is_left_child(node))
-//				node = node->parent;
 		return (node->parent);
 	}
 
@@ -72,12 +68,8 @@ namespace	ft
 	{
 		if (node->left)
 			return (_tree_max(node->left));
-//		if (LIBSTDCPP)
 		while (node->parent && _tree_is_left_child(node))
 			node = node->parent;
-//		else
-//			while (_tree_is_left_child(node))
-//				node = node->parent;
 		return (node->parent);
 	}
 
@@ -176,56 +168,6 @@ namespace	ft
 			}
 		}
 	}
-/*	template <typename NodePtr>
-	void	_tree_insert_rebalance(NodePtr root, NodePtr node)
-	{
-		NodePtr		uncle;
-
-		node->is_black = (node == root);
-		while (node != root && !node->parent->is_black) {
-			if (_tree_is_left_child(node->parent)) {
-				uncle = node->parent->parent->right;
-				if (uncle && !uncle->is_black) {
-					node = node->parent;
-					node->is_black = true;
-					node = node->parent;
-					node->is_black = (node == root);
-					uncle->is_black = true;
-				} else {
-					if (!_tree_is_left_child(node)) {
-						node = node->parent;
-						_tree_rotate_left(node);
-					}
-					node = node->parent;
-					node->is_black = true;
-					node = node->parent;
-					node->is_black = false;
-					_tree_rotate_right(node);
-					break ;
-				}
-			} else {
-				uncle = node->parent->parent->left;
-				if (uncle && !uncle->is_black) {
-					node = node->parent;
-					node->is_black = true;
-					node = node->parent;
-					node->is_black = (node == root);
-					uncle->is_black = true;
-				} else {
-					if (_tree_is_left_child(node)) {
-						node = node->parent;
-						_tree_rotate_right(node);
-					}
-					node = node->parent;
-					node->is_black = true;
-					node = node->parent;
-					node->is_black = false;
-					_tree_rotate_left(node);
-					break ;
-				}
-			}
-		}
-	}*/
 
 	template <typename NodePtr>
 	void	_tree_remove_rebalance_red_sibling(NodePtr& root, NodePtr& sibling,
@@ -308,31 +250,6 @@ namespace	ft
 				break ;
 			}
 		}
-/*		while (true) {
-			if (!_tree_is_left_child(sibling)) {
-				if (!sibling->is_black)
-					_tree_remove_rebalance_red_sibling(root, sibling, false);
-				if ((!sibling->left || sibling->left->is_black)
-						&& (!sibling->right || sibling->right->is_black)) {
-					if (!_tree_remove_rebalance_recurse(root, child, sibling))
-						break ;
-				} else {
-					_tree_remove_rebalance_sibling_red_child(sibling, false);
-					break ;
-				}
-			} else {
-				if (!sibling->is_black)
-					_tree_remove_rebalance_red_sibling(root, sibling, true);
-				if ((!sibling->left || sibling->left->is_black)
-						&& (!sibling->right || sibling->right->is_black)) {
-					if (!_tree_remove_rebalance_recurse(root, child, sibling))
-						break ;
-				} else {
-					_tree_remove_rebalance_sibling_red_child(sibling, true);
-					break ;
-				}
-			}
-		}*/
 	}
 
 	template <typename NodePtr>
@@ -395,134 +312,6 @@ namespace	ft
 				_tree_remove_rebalance(root, to_del_child, to_del_sibling);
 		}
 	}
-/*	template <typename NodePtr>
-	void	_tree_remove(NodePtr root, NodePtr node)
-	{
-		NodePtr		to_del;
-		NodePtr		to_del_child;
-		NodePtr		to_del_sibling = NULL;
-		bool		removed_black;
-
-		to_del = node;
-		if (node->left && node->right)
-			to_del = _tree_next(node);
-		to_del_child = to_del->right;
-		if (to_del->left)
-			to_del_child = to_del->left;
-		if (to_del_child)
-			to_del_child->parent = to_del->parent;
-		if (_tree_is_left_child(to_del)) {
-			to_del->parent->left = to_del_child;
-			if (to_del != root)
-				to_del_sibling = to_del->parent->right;
-			else
-				root = to_del_child;
-		} else {
-			to_del->parent->right = to_del_child;
-			to_del_sibling = to_del->parent->left;
-		}
-		removed_black = to_del->is_black;
-		if (to_del != node) {
-			to_del->parent = node->parent;
-			if (_tree_is_left_child(node))
-				to_del->parent->left = to_del;
-			else
-				to_del->parent->right = to_del;
-			to_del->left = node->left;
-			to_del->left->parent = to_del;
-			to_del->right = node->right;
-			if (to_del->right)
-				to_del->right->parent = to_del;
-			to_del->is_black = node->is_black;
-			if (root == node)
-				root = to_del;
-		}
-		if (removed_black && root) {
-			if (to_del_child)
-				to_del_child->is_black = true;
-			else {
-				while (true) {
-					if (!_tree_is_left_child(to_del_sibling)) {
-						if (!to_del_sibling->is_black) {
-							to_del_sibling->is_black = true;
-							to_del_sibling->parent->is_black = false;
-							_tree_rotate_left(to_del_sibling->parent);
-							if (root == to_del_sibling->left)
-								root = to_del_sibling;
-							to_del_sibling = to_del_sibling->left->right;
-						}
-						if ((!to_del_sibling->left
-								|| to_del_sibling->left->is_black)
-								&& (!to_del_sibling->right
-								|| to_del_sibling->right->is_black)) {
-							to_del_sibling->is_black = false;
-							to_del_child = to_del_sibling->parent;
-							if (to_del_child == root
-									|| !to_del_child->is_black) {
-								to_del_child->is_black = true;
-								break ;
-							}
-							to_del_sibling = to_del_child->parent->left;
-							if (_tree_is_left_child(to_del_child))
-								to_del_sibling = to_del_child->parent->right;
-						} else {
-							if (!to_del_sibling->right
-									|| to_del_sibling->right->is_black) {
-								to_del_sibling->left->is_black = true;
-								to_del_sibling->is_black = false;
-								_tree_rotate_right(to_del_sibling);
-								to_del_sibling = to_del_sibling->parent;
-							}
-							to_del_sibling->is_black =
-								to_del_sibling->parent->is_black;
-							to_del_sibling->parent->is_black = true;
-							to_del_sibling->right->is_black = true;
-							_tree_rotate_left(to_del_sibling->parent);
-							break ;
-						}
-					} else {
-						if (!to_del_sibling->is_black) {
-							to_del_sibling->is_black = true;
-							to_del_sibling->parent->is_black = false;
-							_tree_rotate_right(to_del_sibling->parent);
-							if (root == to_del_sibling->right)
-								root = to_del_sibling;
-							to_del_sibling = to_del_sibling->right->left;
-						}
-						if ((!to_del_sibling->left
-								|| to_del_sibling->left->is_black)
-								&& (!to_del_sibling->right
-								|| to_del_sibling->right->is_black)) {
-							to_del_sibling->is_black = false;
-							to_del_child = to_del_sibling->parent;
-							if (to_del_child == root
-									|| !to_del_child->is_black) {
-								to_del_child->is_black = true;
-								break ;
-							}
-							to_del_sibling = to_del_child->parent->left;
-							if (_tree_is_left_child(to_del_child))
-								to_del_sibling = to_del_child->parent->right;
-						} else {
-							if (!to_del_sibling->left
-									|| to_del_sibling->left->is_black) {
-								to_del_sibling->right->is_black = true;
-								to_del_sibling->is_black = false;
-								_tree_rotate_left(to_del_sibling);
-								to_del_sibling = to_del_sibling->parent;
-							}
-							to_del_sibling->is_black =
-								to_del_sibling->parent->is_black;
-							to_del_sibling->parent->is_black = true;
-							to_del_sibling->left->is_black = true;
-							_tree_rotate_right(to_del_sibling->parent);
-							break ;
-						}
-					}
-				}
-			}
-		}
-	}*/
 
 	/*
 	** Debugging: "_tree_sub_invariant" returns the black height of a subtree,
@@ -530,6 +319,7 @@ namespace	ft
 	** "_tree_invariant" returns true if the tree rooted at "root" is a proper
 	** red-black tree, and false otherwise
 	*/
+
 	template <typename NodePtr>
 	size_t	_tree_sub_invariant(NodePtr node)
 	{
@@ -573,9 +363,9 @@ namespace	ft
 
 	/*
 	** The "_tree" nodes are built through a "node_base" class with "parent",
-	** "left" and "right" pointers to nodes, and a "is_black" color.
+	** "left" and "right" pointers to nodes, and a "is_black" color
 	** The value is only stored in the "node" class, so that the "_tree"'s
-	** "end_node" can be created without a value to initialize.
+	** "end_node" can be created without a value to initialize
 	*/
 
 	class	_tree_node_base {
@@ -608,7 +398,7 @@ namespace	ft
 		explicit _tree_node(const T& data): data(data) { }
 		virtual ~_tree_node(void) { }
 
-		T			data;
+		value_type		data;
 	private:
 		_tree_node(void);
 		_tree_node(const _tree_node&);
@@ -734,7 +524,7 @@ namespace	ft
 	/**************************************************************************/
 
 	/*
-	** The "_tree_base" is created first to manage the "end_node"
+	** The "_tree_base" is managing the "end_node"
 	*/
 
 	template <class Allocator>
@@ -747,20 +537,17 @@ namespace	ft
 		typedef typename node_base_allocator::
 										const_pointer	node_base_const_pointer;
 	protected:
-//		_tree_base(const Allocator& alloc);
 		_tree_base(void);
 		~_tree_base(void);
 
 		node_base_allocator		_node_base_alloc;
 		node_base_pointer		_end_node_ptr;
 	private:
-//		_tree_base(void);
 		_tree_base(const _tree_base&);
 		_tree_base&	operator=(const _tree_base&);
 	};
 
 	template <class Allocator>
-//	_tree_base<Allocator>::_tree_base(const Allocator& alloc):
 	_tree_base<Allocator>::_tree_base(void):
 										_node_base_alloc(node_base_allocator()),
 										_end_node_ptr(NULL)
@@ -880,7 +667,7 @@ namespace	ft
 		const node_base_pointer&	_begin_node(void) const { return
 															(_begin_node_ptr); }
 
-		template <typename InputIt>	// protect via enable_if ?
+		template <typename InputIt>
 		void				_assign_unique(InputIt first, InputIt last);
 		node_pointer		_clone_node(node_const_pointer src_node);
 		void				_structural_copy(node_base_pointer parent,
@@ -949,10 +736,7 @@ namespace	ft
 												_begin_node_ptr(NULL)
 	{
 		_begin_node() = end_node();
-//		if (LIBSTDCPP)
 		_assign_tree(src);
-//		else
-//			_assign_unique(rhs.begin(), rhs.end());
 	}
 
 	/**************************************************************************/
@@ -967,10 +751,7 @@ namespace	ft
 			clear();
 			_comp = rhs._comp;
 			_node_alloc = rhs._node_alloc;
-//			if (LIBSTDCPP)
 			_assign_tree(rhs);
-//			else
-//				_assign_unique(rhs.begin(), rhs.end());
 		}
 		return (*this);
 	}
@@ -1117,20 +898,16 @@ namespace	ft
 	}
 
 	template <typename T, class Compare, class Allocator>
-	void	_tree<T, Compare, Allocator>::swap(_tree& other)	// test
+	void	_tree<T, Compare, Allocator>::swap(_tree& other)
 	{
 		std::swap(this->_end_node_ptr, other._end_node_ptr);
 		std::swap(_begin_node_ptr, other._begin_node_ptr);
 		std::swap(_comp, other._comp);
 		std::swap(_node_alloc, other._node_alloc);
 		std::swap(_size, other._size);
-		if (_size == 0)
-			_begin_node() = end_node();	// pas besoin ?
-		else
+		if (_size != 0)
 			end_node()->left->parent = end_node();
-		if (other._size == 0)
-			other._begin_node() = other.end_node();	// pas besoin ?
-		else
+		if (other._size != 0)
 			other.end_node()->left->parent = other.end_node();
 	}
 
@@ -1232,7 +1009,7 @@ namespace	ft
 	typename _tree<T, Compare, Allocator>::iterator
 		_tree<T, Compare, Allocator>::insert_unique(iterator hint,
 													const value_type& value)
-	{	// no hint < val < next check in libstdcpp!?!
+	{
 		iterator			prev = hint;
 		node_base_pointer	parent;
 
