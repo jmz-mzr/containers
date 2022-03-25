@@ -18,7 +18,8 @@ namespace	ft
 
 	template <typename InputIt1, typename InputIt2, class Compare>
 	bool	lexicographical_compare(InputIt1 first1, InputIt1 last1,
-									InputIt2 first2, InputIt2 last2, Compare cmp)
+									InputIt2 first2, InputIt2 last2,
+									Compare cmp)
 	{
 		for ( ; first1 != last1; ++first1, ++first2) {
 			if (first2 == last2 || cmp(*first2, *first1))
