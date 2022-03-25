@@ -156,8 +156,11 @@ void	member_operators__tests(void)
 	tree1.print(); std::cout << std::endl;
 	std::cout << "tree2(tree1):" << expect(" [same]") << std::endl;
 	tree2.print(); std::cout << std::endl;
-	std::cout << "tree0:" << expect(" [empty]") << "\n" << std::endl;
-	std::cout << "tree2 = tree0:" << expect(" [same]") << "\n" << std::endl;
+	std::cout << "tree0:" << expect(" [empty]");
+	tree0.print(); std::cout << "\n" << std::endl;
+	std::cout << "tree2 = tree0:" << expect(" [same]");
+	tree2 = tree0;
+	tree2.print(); std::cout << "\n" << std::endl;
 }
 
 void	element_access__tests(void)
@@ -259,6 +262,19 @@ void	iterators__tests(void)
 	tree_t::const_iterator			const_it2(it0);
 	tree_t::const_iterator			const_it2_2(const_it0);
 
+	it0 = tree1.begin(); const_it0 = tree1.end();
+	std::cout << std::boolalpha;
+	std::cout << "tree1.begin() == tree1.end() (const): "
+		<< (it0 == const_it0) << expect(" [false]") << std::endl;
+	std::cout << "tree1.end() (const) == tree1.begin(): "
+		<< (const_it0 == it0) << expect(" [false]") << std::endl;
+	const_it0 = tree1.begin(); it0 = tree1.end();
+	std::cout << "tree1.begin() (const) != tree1.end(): "
+		<< (it0 != const_it0) << expect("  [true]") << std::endl;
+	std::cout << "tree1.end() != tree1.begin() (const): "
+		<< (const_it0 != it0) << expect("  [true]") << std::endl;
+	std::cout << std::noboolalpha << std::endl;
+
 	it2 = it1;
 	const_it2 = it1;
 	const_it2_2 = const_it1;
@@ -290,8 +306,51 @@ void	modifiers__tests(void)
 
 	ft::pair<tree_t::iterator, bool>						inserted;
 	tree_t::iterator										it;
+	ft::_tree<int, std::less<int>, std::allocator<int> >	tree0;
 	ft::_tree<int, std::less<int>, std::allocator<int> >	tree1;
 	ft::_tree<int, std::less<int>, std::allocator<int> >	tree2;
+
+	it = tree0.insert_unique(tree0.begin(), 1);		// 1
+	if (it != tree0.begin())
+		std::cout << "Error!" << std::endl;
+	it = tree0.insert_unique(tree0.end(), 1);		// 2
+	if (*it != 1)
+		std::cout << "Error!" << std::endl;
+	it = tree0.insert_unique(tree0.end(), 0);		// 3
+	if (it != tree0.begin())
+		std::cout << "Error!" << std::endl;
+	it = tree0.insert_unique(tree0.begin(), 0);		// 4
+	if (*it != 0)
+		std::cout << "Error!" << std::endl;
+	it = tree0.insert_unique(tree0.begin(), 4);		// 5
+	if (it != --tree0.end())
+		std::cout << "Error!" << std::endl;
+	it = --tree0.end();
+	it = tree0.insert_unique(--it, 2);				// 6
+	if (*it != 2)
+		std::cout << "Error!" << std::endl;
+	it = tree0.insert_unique(++tree0.begin(), 2);	// 7
+	if (*it != 2)
+		std::cout << "Error!" << std::endl;
+	it = tree0.insert_unique(tree0.end(), 5);		// 8
+	if (it != --tree0.end())
+		std::cout << "Error!" << std::endl;
+	it = tree0.insert_unique(--tree0.end(), 6);		// 9
+	if (it != --tree0.end())
+		std::cout << "Error!" << std::endl;
+	it = tree0.insert_unique(tree0.begin(), -1);	// 10
+	if (it != tree0.begin())
+		std::cout << "Error!" << std::endl;
+	it = ++tree0.begin();
+	it = tree0.insert_unique(++it, 3);				// 11
+	if (*it != 3)
+		std::cout << "Error!" << std::endl;
+	it = tree0.insert_unique(--tree0.end(), 7);		// 12
+	if (it != --tree0.end())
+		std::cout << "Error!" << std::endl;
+
+	std::cout << "tree0:" << expect(" [1 | 0, 4 | -1, 2, 6 | 3, 5, 7]") << std::endl;
+	tree0.print(); std::cout << std::endl;
 
 	inserted = tree1.insert_unique(2);
 	if (inserted.first != tree1.begin() || inserted.second == false)
@@ -307,23 +366,6 @@ void	modifiers__tests(void)
 		std::cout << "Error!" << std::endl;
 	inserted = tree1.insert_unique(3);
 	if (*inserted.first != 3 || inserted.second == true)
-		std::cout << "Error!" << std::endl;
-
-	tree1.clear();
-	it = tree1.insert_unique(tree1.begin(), 2);
-	if (it != tree1.begin())
-		std::cout << "Error!" << std::endl;
-	it = tree1.insert_unique(tree1.end(), 1);
-	if (it != tree1.begin())
-		std::cout << "Error!" << std::endl;
-	it = tree1.insert_unique(tree1.begin(), 4);
-	if (it != --tree1.end())
-		std::cout << "Error!" << std::endl;
-	it = tree1.insert_unique(tree1.begin(), 3);
-	if (*it != 3)
-		std::cout << "Error!" << std::endl;
-	it = tree1.insert_unique(++tree1.begin(), 3);
-	if (*it != 3)
 		std::cout << "Error!" << std::endl;
 
 	std::cout << "tree1:" << expect(" [2 | 1, 4 | 3]") << std::endl;

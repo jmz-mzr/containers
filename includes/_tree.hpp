@@ -409,6 +409,11 @@ namespace	ft
 	/*                             _TREE ITERATORS                            */
 	/**************************************************************************/
 
+	/*
+	** In order to avoid the "get_ptr()" accessors, we would have to declare
+	** "_tree" as a friend class, which might be forbidden in evaluation
+	*/
+
 	template <typename T>
 	class	_tree_iterator {
 	public:
@@ -428,12 +433,13 @@ namespace	ft
 		explicit _tree_iterator(_node_base_pointer ptr): _ptr(ptr) { }
 		~_tree_iterator(void) { }
 
-		_tree_iterator&	operator=(const _tree_iterator& rhs) {
-											_ptr = rhs._ptr; return (*this); }
+		_tree_iterator&	operator=(const _tree_iterator& rhs)
+							{ _ptr = rhs._ptr; return (*this); }
 
-		reference		operator*(void) const {
-							return (static_cast<_node_pointer>(_ptr)->data); }
-		pointer			operator->(void) const { return (&(operator*())); }
+		reference		operator*(void) const
+							{ return (static_cast<_node_pointer>(_ptr)->data); }
+		pointer			operator->(void) const
+							{ return (&(operator*())); }
 
 		_tree_iterator&	operator++(void) { _ptr = _tree_next(_ptr);
 											return (*this); }
@@ -445,22 +451,16 @@ namespace	ft
 											--(*this); return (it); }
 
 		const _node_base_pointer&	get_ptr(void) const { return (_ptr); }
+
+		friend bool	operator==(const _tree_iterator& lhs,
+								const _tree_iterator& rhs)
+							{ return (lhs._ptr == rhs._ptr); }
+		friend bool	operator!=(const _tree_iterator& lhs,
+								const _tree_iterator& rhs)
+							{ return (!(lhs == rhs)); }
 	private:
 		_node_base_pointer		_ptr;
 	};
-
-	template <typename T>
-	bool	operator==(const _tree_iterator<T>& lhs,
-						const _tree_iterator<T>& rhs)
-	{
-		return (lhs.get_ptr() == rhs.get_ptr());
-	}
-	template <typename T>
-	bool	operator!=(const _tree_iterator<T>& lhs,
-						const _tree_iterator<T>& rhs)
-	{
-		return (!(lhs == rhs));
-	}
 
 	template <typename T>
 	class	_tree_const_iterator {
@@ -483,48 +483,43 @@ namespace	ft
 														_ptr(it.get_ptr()) { }
 		explicit _tree_const_iterator(_node_base_pointer ptr): _ptr(ptr) { }
 
-		_tree_const_iterator&	operator=(const _tree_const_iterator& rhs) {
-											_ptr = rhs._ptr; return (*this); }
+		_tree_const_iterator&	operator=(const _tree_const_iterator& rhs)
+											{ _ptr = rhs._ptr; return (*this); }
 
-		reference		operator*(void) const {
-							return (static_cast<_node_pointer>(_ptr)->data); }
-		pointer			operator->(void) const { return (&(operator*())); }
+		reference		operator*(void) const
+							{ return (static_cast<_node_pointer>(_ptr)->data); }
+		pointer			operator->(void) const
+							{ return (&(operator*())); }
 
 		_tree_const_iterator&	operator++(void) { _ptr = _tree_next(_ptr);
 													return (*this); }
 		_tree_const_iterator&	operator--(void) { _ptr = _tree_prev(_ptr);
 													return (*this); }
-		_tree_const_iterator	operator++(int) {
-												_tree_const_iterator it(*this);
+		_tree_const_iterator	operator++(int)
+											{ _tree_const_iterator it(*this);
 												++(*this); return (it); }
-		_tree_const_iterator	operator--(int) {
-												_tree_const_iterator it(*this);
+		_tree_const_iterator	operator--(int)
+											{ _tree_const_iterator it(*this);
 												--(*this); return (it); }
 
 		const _node_base_pointer&	get_ptr(void) const { return (_ptr); }
+
+		friend bool	operator==(const _tree_const_iterator& lhs,
+								const _tree_const_iterator& rhs)
+							{ return (lhs._ptr == rhs._ptr); }
+		friend bool	operator!=(const _tree_const_iterator& lhs,
+								const _tree_const_iterator& rhs)
+							{ return (!(lhs == rhs)); }
 	private:
 		_node_base_pointer		_ptr;
 	};
 
-	template <typename T>
-	bool	operator==(const _tree_const_iterator<T>& lhs,
-						const _tree_const_iterator<T>& rhs)
-	{
-		return (lhs.get_ptr() == rhs.get_ptr());
-	}
-	template <typename T>
-	bool	operator!=(const _tree_const_iterator<T>& lhs,
-						const _tree_const_iterator<T>& rhs)
-	{
-		return (!(lhs == rhs));
-	}
-
 	/**************************************************************************/
-	/*                               _TREE CLASS                              */
+	/*                            _TREE_BASE CLASS                            */
 	/**************************************************************************/
 
 	/*
-	** The "_tree_base" is managing the "end_node"
+	** The "_tree_base" is managing the "_tree"'s "end_node"
 	*/
 
 	template <class Allocator>
@@ -564,6 +559,10 @@ namespace	ft
 		_end_node_ptr = NULL;
 	}
 
+	/**************************************************************************/
+	/*                               _TREE CLASS                              */
+	/**************************************************************************/
+
 	template <typename T, class Compare, class Allocator>
 	class	_tree: protected _tree_base<Allocator> {
 	public:
@@ -597,35 +596,32 @@ namespace	ft
 
 		_tree&	operator=(const _tree& rhs);
 
-		value_compare&			value_comp(void) { return (_comp); }
 		const value_compare&	value_comp(void) const { return (_comp); }
-		node_allocator&			node_alloc(void) { return (_node_alloc); }
-		const node_allocator&	node_alloc(void) const { return
-															(_node_alloc); }
-		allocator_type			alloc(void) const { return (allocator_type
-															(_node_alloc)); }
+		const node_allocator&	node_alloc(void) const { return (_node_alloc); }
+		allocator_type			alloc(void) const
+									{ return (allocator_type(_node_alloc)); }
 
 		const size_type&	size(void) const { return (_size); }
-		size_type			max_size(void) const { return
-												(_node_alloc.max_size()); }
+		size_type			max_size(void) const
+											{ return (_node_alloc.max_size()); }
 
 		node_base_pointer		end_node(void) { return (this->_end_node_ptr); }
-		node_base_const_pointer	end_node(void) const { return
-														(this->_end_node_ptr); }
+		node_base_const_pointer	end_node(void) const
+											{ return (this->_end_node_ptr); }
 
 		node_pointer		root(void) { return (static_cast
 									<node_pointer>(end_node()->left)); }
 		node_const_pointer	root(void) const { return (static_cast
 									<node_const_pointer>(end_node()->left)); }
 
-		iterator			begin(void) { return
-											(iterator(_begin_node())); }
-		const_iterator		begin(void) const { return
-											(const_iterator(_begin_node())); }
-		iterator			end(void) { return
-											(iterator(end_node())); }
-		const_iterator		end(void) const { return
-											(const_iterator(end_node())); }
+		iterator			begin(void)
+									{ return (iterator(_begin_node())); }
+		const_iterator		begin(void) const
+									{ return (const_iterator(_begin_node())); }
+		iterator			end(void)
+									{ return (iterator(end_node())); }
+		const_iterator		end(void) const
+									{ return (const_iterator(end_node())); }
 
 		ft::pair<iterator, bool>	insert_unique(const value_type& value);
 		iterator					insert_unique(iterator hint,
@@ -662,10 +658,10 @@ namespace	ft
 	private:
 		typedef _tree_base<Allocator>	_base;
 
-		node_base_pointer&			_begin_node(void) { return
-															(_begin_node_ptr); }
-		const node_base_pointer&	_begin_node(void) const { return
-															(_begin_node_ptr); }
+		node_base_pointer&			_begin_node(void)
+												{ return (_begin_node_ptr); }
+		const node_base_pointer&	_begin_node(void) const
+												{ return (_begin_node_ptr); }
 
 		template <typename InputIt>
 		void				_assign_unique(InputIt first, InputIt last);
@@ -679,6 +675,8 @@ namespace	ft
 												node_base_pointer& child,
 												node_base_pointer new_node);
 		iterator			_insert_unique_after(iterator hint,
+													const value_type& value);
+		iterator			_insert_unique_before(iterator hint,
 													const value_type& value);
 		void				_destroy(node_pointer node);
 		void				_print(node_base_const_pointer root,
@@ -1002,7 +1000,30 @@ namespace	ft
 				return (_insert_node_at(parent, parent->left,
 							_construct_node(value)));
 			}
-		}
+		} else if (!_comp(*next, value))
+			return (next);
+		return (insert_unique(value).first);
+	}
+	template <typename T, class Compare, class Allocator>
+	typename _tree<T, Compare, Allocator>::iterator
+		_tree<T, Compare, Allocator>::_insert_unique_before(iterator hint,
+														const value_type& value)
+	{
+		iterator			prev = hint;
+		node_base_pointer	parent;
+
+		if (hint == begin() || _comp(*--prev, value)) {
+			if (hint != end() && !hint.get_ptr()->left) {
+				parent = hint.get_ptr();
+				return (_insert_node_at(parent, parent->left,
+							_construct_node(value)));
+			} else {
+				parent = prev.get_ptr();
+				return (_insert_node_at(parent, parent->right,
+							_construct_node(value)));
+			}
+		} else if (!_comp(value, *prev))
+			return (prev);
 		return (insert_unique(value).first);
 	}
 	template <typename T, class Compare, class Allocator>
@@ -1015,20 +1036,12 @@ namespace	ft
 
 		if (hint != end() && _comp(*hint, value))
 			return (_insert_unique_after(hint, value));
-		else if (hint == end() || _comp(value, *hint)) {
-			if (hint == begin() || (hint != end() && _comp(*--prev, value))) {
-				if (!hint.get_ptr()->left) {
-					parent = hint.get_ptr();
-					return (_insert_node_at(parent, parent->left,
-								_construct_node(value)));
-				} else {
-					parent = prev.get_ptr();
-					return (_insert_node_at(parent, parent->right,
-								_construct_node(value)));
-				}
-			}
-			return (insert_unique(value).first);
-		}
+		else if (hint == end() && hint == begin()) {
+			parent = hint.get_ptr();
+			return (_insert_node_at(parent, parent->left,
+						_construct_node(value)));
+		} else if (hint == end() || _comp(value, *hint))
+			return (_insert_unique_before(hint, value));
 		return (hint);
 	}
 
