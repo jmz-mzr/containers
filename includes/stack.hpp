@@ -8,9 +8,10 @@ namespace	ft
 /*
 ** In order for the compiler and the linker to find the instantiated operators
 ** definitions, we either forward declare the class and the operators templates
-** before declaring the operators as friend function template specializations,
-** or we declare all the instantiations of the operator templates as friend
-** (see https://bit.ly/3MggOiw and https://bit.ly/3IDt6Q2)
+** before declaring the operators as friend function template specializations
+** (or we directly define the operators inside the class template body), or we
+** declare all the instantiations of the operator templates as friend
+** (see https://bit.ly/3MggOiw, https://bit.ly/3IDt6Q2, https://bit.ly/3iINrIh)
 ** The former protects the operators from being specialized (in another header)
 ** to access all protected/private members of other types thanks to the
 ** 'universal' friendship granted to all template instantiations, an exploit
