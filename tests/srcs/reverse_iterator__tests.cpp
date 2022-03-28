@@ -27,7 +27,7 @@ void	reverse_iterator__tests(void)
 							revIt2(revIt);
 	NMSP::reverse_iterator<std::vector<int>::iterator>
 							revItVec1(vec.end());
-	NMSP::reverse_iterator<std::vector<int>::iterator>
+	NMSP::reverse_iterator<std::vector<int>::const_iterator>
 							revItVec2(vec.end());
 	NMSP::reverse_iterator<std::list<std::string>::iterator>
 							revItLst1(lst.end());
@@ -71,6 +71,8 @@ void	reverse_iterator__tests(void)
 	std::cout << std::boolalpha;
 	std::cout << "lstRbegin == lstRend: " << (revItLst1 == revItLst2)
 		<< "\nlstRbegin != lstRend: " << (revItLst1 != revItLst2)
+		<< "\nvecRbegin == vecRend: " << (revItVec1 == revItVec2)
+		<< "\nvecRbegin != vecRend: " << (revItVec1 != revItVec2)
 		<< "\nvecRbegin < vecRend: " << (revItVec1 < revItVec2)
 		<< "\nvecRbegin <= vecRend: " << (revItVec1 <= revItVec2)
 		<< "\nvecRbegin <= vecRbegin: " << (revItVec1 <= revItVec1)
