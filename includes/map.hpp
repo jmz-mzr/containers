@@ -24,7 +24,7 @@ namespace	ft
 	class	_map_value_compare {
 	private:
 		typedef ft::pair<const Key, T>	_pair;
-	public:	// canonical
+	public:
 		_map_value_compare(void): _comp() { }
 		_map_value_compare(Compare c): _comp(c) { }
 
@@ -225,7 +225,7 @@ namespace	ft
 	bool	operator<(const map<Key, T, Compare, Allocator>& lhs,
 						const map<Key, T, Compare, Allocator>& rhs)
 	{
-		return (ft::lexicographical_compare(lhs.begin(), lhs.begin(),
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(),
 												rhs.begin(), rhs.end()));
 	}
 

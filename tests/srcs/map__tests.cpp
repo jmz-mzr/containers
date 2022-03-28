@@ -1,8 +1,7 @@
 #include <iostream>
 #include <map>
-//#include "hackStdStack.hpp"
+#include <vector>
 #include "map.hpp"
-//#include "hackFtStack.hpp"
 #include "colors.hpp"
 #include "enable_if.hpp"
 #include "pair.hpp"
@@ -16,11 +15,11 @@
 #endif
 
 #ifdef __APPLE__
-# define SPEED_STRLEN		7500
-# define SPEED_VEC_SIZE		3000
+# define SPEED_STRLEN		400
+# define SPEED_VEC_SIZE		300
 #elif defined(__linux__)
-# define SPEED_STRLEN		5000
-# define SPEED_VEC_SIZE		2000
+# define SPEED_STRLEN		300
+# define SPEED_VEC_SIZE		200
 #endif
 
 /******************************************************************************/
@@ -88,6 +87,21 @@ public:
 	{
 		return (std::allocator<T>::deallocate(p, n));
 	}
+};
+
+/*
+** Build a heavy class to test the performance
+** (the defined values depend on your machine: here my Linux VM cannot
+** handle the same tests as my native MacOS)
+*/
+
+class	HeavyMap {
+public:
+	HeavyMap(void): str(SPEED_STRLEN, '-'), strVec(SPEED_VEC_SIZE, str) { }
+	HeavyMap(char c): str(SPEED_STRLEN, c), strVec(SPEED_VEC_SIZE, str) { }
+private:
+	std::string					str;
+	std::vector<std::string>	strVec;
 };
 
 /******************************************************************************/
@@ -292,13 +306,13 @@ void	iterators__tests(void)
 	it2 = it1;
 	const_it2 = it1;
 	const_it2_2 = const_it1;
-	if (!LIBCPP) {	// crash aussi dans LIBSTDCPP ?
+	if (!LIBCPP) {
 		it2++; it2 = it1;
 		++it2; it2 = it1;
 	}
 	it2--; it2 = it1;
 	--it2;
-	if (!LIBCPP) {	// crash aussi dans LIBSTDCPP ?
+	if (!LIBCPP) {
 		const_it2++; const_it2 = const_it1;
 		++const_it2; const_it2 = const_it1;
 	}
@@ -310,13 +324,13 @@ void	iterators__tests(void)
 	const_r_it2_2 = const_r_it1;
 	r_it2++; r_it2 = r_it1;
 	++r_it2; r_it2 = r_it1;
-	if (!LIBCPP) {	// crash aussi dans LIBSTDCPP ?
+	if (!LIBCPP) {
 		r_it2--; r_it2 = r_it1;
 		--r_it2;
 	}
 		const_r_it2++; const_r_it2 = const_r_it1;
 		++const_r_it2; const_r_it2 = const_r_it1;
-	if (!LIBCPP) {	// crash aussi dans LIBSTDCPP ?
+	if (!LIBCPP) {
 		const_r_it2--; const_r_it2 = const_r_it1;
 		--const_r_it2;
 	}
@@ -345,230 +359,276 @@ void	iterators__tests(void)
 	std::cout << "map2: "; print(map2);
 	std::cout << std::endl;
 }
-/*
+
 void	modifiers__tests(void)
 {
-	typedef NMSP::map<int, std::less<int>, std::allocator<int> >
-															map_t;
+	typedef NMSP::map<int, int>			map_t;
 
-	NMSP::pair<map_t::iterator, bool>						inserted;
-	map_t::iterator										it;
-	NMSP::map<int, std::less<int>, std::allocator<int> >	map0;
-	NMSP::map<int, std::less<int>, std::allocator<int> >	map1;
-	NMSP::map<int, std::less<int>, std::allocator<int> >	map2;
+	NMSP::pair<map_t::iterator, bool>	inserted;
+	map_t::iterator						it;
+	NMSP::map<int, int>					map0;
+	NMSP::map<int, int>					map1;
+	NMSP::map<int, int>					map2;
 
-	it = map0.insert(map0.begin(), 1);		// 1
+	it = map0.insert(map0.begin(), NMSP::pair<const int, int>(1, 1));	// 1
 	if (it != map0.begin())
 		std::cout << "Error!" << std::endl;
-	it = map0.insert(map0.end(), 1);		// 2
-	if (*it != 1)
+	it = map0.insert(map0.end(), NMSP::pair<const int, int>(1, 1));		// 2
+	if (*it != NMSP::pair<const int, int>(1, 1))
 		std::cout << "Error!" << std::endl;
-	it = map0.insert(map0.end(), 0);		// 3
+	it = map0.insert(map0.end(), NMSP::pair<const int, int>(0, 0));		// 3
 	if (it != map0.begin())
 		std::cout << "Error!" << std::endl;
-	it = map0.insert(map0.begin(), 0);		// 4
-	if (*it != 0)
+	it = map0.insert(map0.begin(), NMSP::pair<const int, int>(0, 0));	// 4
+	if (*it != NMSP::pair<const int, int>(0, 0))
 		std::cout << "Error!" << std::endl;
-	it = map0.insert(map0.begin(), 4);		// 5
+	it = map0.insert(map0.begin(), NMSP::pair<const int, int>(4, 4));	// 5
 	if (it != --map0.end())
 		std::cout << "Error!" << std::endl;
 	it = --map0.end();
-	it = map0.insert(--it, 2);				// 6
-	if (*it != 2)
+	it = map0.insert(--it, NMSP::pair<const int, int>(2, 2));			// 6
+	if (*it != NMSP::pair<const int, int>(2, 2))
 		std::cout << "Error!" << std::endl;
-	it = map0.insert(++map0.begin(), 2);	// 7
-	if (*it != 2)
+	it = map0.insert(++map0.begin(), NMSP::pair<const int, int>(2, 2));	// 7
+	if (*it != NMSP::pair<const int, int>(2, 2))
 		std::cout << "Error!" << std::endl;
-	it = map0.insert(map0.end(), 5);		// 8
+	it = map0.insert(map0.end(), NMSP::pair<const int, int>(5, 5));		// 8
 	if (it != --map0.end())
 		std::cout << "Error!" << std::endl;
-	it = map0.insert(--map0.end(), 6);		// 9
+	it = map0.insert(--map0.end(), NMSP::pair<const int, int>(6, 6));	// 9
 	if (it != --map0.end())
 		std::cout << "Error!" << std::endl;
-	it = map0.insert(map0.begin(), -1);	// 10
+	it = map0.insert(map0.begin(), NMSP::pair<const int, int>(-1, -1));	// 10
 	if (it != map0.begin())
 		std::cout << "Error!" << std::endl;
 	it = ++map0.begin();
-	it = map0.insert(++it, 3);				// 11
-	if (*it != 3)
+	it = map0.insert(++it, NMSP::pair<const int, int>(3, 3));			// 11
+	if (*it != NMSP::pair<const int, int>(3, 3))
 		std::cout << "Error!" << std::endl;
-	it = map0.insert(--map0.end(), 7);		// 12
+	it = map0.insert(--map0.end(), NMSP::pair<const int, int>(7, 7));	// 12
 	if (it != --map0.end())
 		std::cout << "Error!" << std::endl;
 
-	std::cout << "map0:" << expect(" [1 | 0, 4 | -1, 2, 6 | 3, 5, 7]") << std::endl;
-	print(map0); std::cout << std::endl;
+	std::cout << "map0: "; print(map0);
+	std::cout << std::endl;
 
-	inserted = map1.insert(2);
+	inserted = map1.insert(NMSP::pair<const int, int>(2, 2));
 	if (inserted.first != map1.begin() || inserted.second == false)
 		std::cout << "Error!" << std::endl;
-	inserted = map1.insert(1);
+	inserted = map1.insert(NMSP::pair<const int, int>(1, 1));
 	if (inserted.first != map1.begin() || inserted.second == false)
 		std::cout << "Error!" << std::endl;
-	inserted = map1.insert(4);
+	inserted = map1.insert(NMSP::pair<const int, int>(4, 4));
 	if (inserted.first != --map1.end() || inserted.second == false)
 		std::cout << "Error!" << std::endl;
-	inserted = map1.insert(3);
-	if (*inserted.first != 3 || inserted.second == false)
+	inserted = map1.insert(NMSP::pair<const int, int>(3, 3));
+	if (*inserted.first != NMSP::pair<const int, int>(3, 3)
+			|| inserted.second == false)
 		std::cout << "Error!" << std::endl;
-	inserted = map1.insert(3);
-	if (*inserted.first != 3 || inserted.second == true)
+	inserted = map1.insert(NMSP::pair<const int, int>(3, 3));
+	if (*inserted.first != NMSP::pair<const int, int>(3, 3)
+			|| inserted.second == true)
 		std::cout << "Error!" << std::endl;
 
-	std::cout << "map1:" << expect(" [2 | 1, 4 | 3]") << std::endl;
-	print(map1); std::cout << std::endl;
+	std::cout << "map1: "; print(map1);
+	std::cout << std::endl;
+
+	std::cout << "map2.insert(map0.end(), map0.end())\n";
+	map2.insert(map0.end(), map0.end());
+	std::cout << "map2: "; print(map2);
+	std::cout << "map2.insert(map0.begin(), ++map0.begin())\n";
+	map2.insert(map0.begin(), ++map0.begin());
+	std::cout << "map2: "; print(map2);
+	std::cout << "map2.insert(map0.begin(), map0.end())\n";
+	map2.insert(map0.begin(), map0.end());
+	std::cout << "map2: "; print(map2);
+	std::cout << std::endl;
 
 	std::cout << "map2 = map1;" << std::endl; map2 = map1;
 	std::cout << "map2.erase(map2.begin(), map2.end());" << std::endl;
 	map2.erase(map2.begin(), map2.end());
-	std::cout << "map2:" << expect(" [empty]") << std::endl;
-	print(map2); std::cout << std::endl;
+	std::cout << "map2: "; print(map2);
+	std::cout << std::endl;
 
 	std::cout << "map2 = map1;" << std::endl; map2 = map1;
 	std::cout << "map2.erase(map2.begin()); (x2)" << std::endl;
 	map2.erase(map2.begin()); map2.erase(map2.begin());
-	std::cout << "map2:" << expect(" [3 | 4]") << std::endl;
-	print(map2); std::cout << std::endl;
+	std::cout << "map2: "; print(map2);
+	std::cout << std::endl;
 
-	std::cout << "map2.swap(map1); (x2)" << std::endl;
-	map2.swap(map1); map2.swap(map1);
+	std::cout << "map2.swap(map1); swap(map1, map2);" << std::endl;
+	map2.swap(map1); swap(map1, map2);
 	std::cout << "map2 = map1;" << std::endl; map2 = map1;
 //	std::cout << "map2.erase(map2.end());" << std::endl;	// Should crash!
 //	map2.erase(map2.end());	// Should crash!
 	std::cout << "map2.erase(--map2.end());" << std::endl;
 	map2.erase(--map2.end());
-	std::cout << "map2.erase(4) = "
-		<< map2.erase(4) << expect(" [0]") << std::endl;
-	std::cout << "map2.erase(2) = "
-		<< map2.erase(2) << expect(" [1]") << std::endl;
-	std::cout << "map2:" << expect(" [3 | 1]") << std::endl;
-	print(map2); std::cout << std::endl;
+	std::cout << "map2.erase(4) = " << map2.erase(4) << std::endl;
+	std::cout << "map2.erase(2) = " << map2.erase(2) << std::endl;
+	std::cout << "map2: "; print(map2);
+	std::cout << std::endl;
 
-	std::cout << "map2.erase(3) = "
-		<< map2.erase(3) << expect(" [1]") << std::endl;
-	std::cout << "map2.erase(1) = "
-		<< map2.erase(1) << expect(" [1]") << std::endl;
-	std::cout << "map2.erase(1) = "
-		<< map2.erase(1) << expect(" [0]") << std::endl;
-	std::cout << "map2:" << expect(" [empty]") << std::endl
-		<< (map2.begin() == map2.end() ? "" : "Error!");
-	print(map2); std::cout << std::endl;
+	std::cout << "map2.erase(3) = " << map2.erase(3) << std::endl;
+	std::cout << "map2.erase(1) = " << map2.erase(1) << std::endl;
+	std::cout << "map2.erase(1) = " << map2.erase(1) << std::endl;
+	std::cout << "map2: "; print(map2);
+	std::cout << std::endl;
 
-	std::cout << "map2.swap(map1);" << std::endl;
-	map2.swap(map1);
-	std::cout << "map2:" << expect(" [2 | 1, 4 | 3]") << std::endl;
-	print(map2); std::cout << std::endl;
+	std::cout << "map2.swap(map1); (x2); swap(map1, map2);" << std::endl;
+	map2.swap(map1); map2.swap(map1); swap(map1, map2);
+	std::cout << "map2: "; print(map2);
+	std::cout << std::endl;
 
 	std::cout << "map2.clear();" << std::endl;
 	map2.clear();
-	std::cout << "map2:" << expect(" [empty]") << std::endl;
-	print(map2); std::cout << std::endl;
+	std::cout << "map2: "; print(map2);
+	std::cout << std::endl;
 }
 
 void	search__tests(void)
 {
-	typedef NMSP::map<int, std::less<int>, std::allocator<int> >
-																map_t;
+	typedef NMSP::map<int, int>		map_t;
 
-	map_t::iterator											it;
+	map_t::iterator												it;
 	map_t::const_iterator										const_it;
 	NMSP::pair<map_t::iterator, map_t::iterator>				eq_range;
 	NMSP::pair<map_t::const_iterator, map_t::const_iterator>	const_eq_range;
-	NMSP::map<int, std::less<int>, std::allocator<int> >		map1;
-	map1.insert(2);
-	map1.insert(1);
-	map1.insert(4);
-	map1.insert(3);
-	const NMSP::map<int, std::less<int>, std::allocator<int> >	map2(map1);
+	NMSP::map<int, int>											map1;
+	map1.insert(NMSP::pair<int, int>(2, 2));
+	map1.insert(NMSP::pair<int, int>(1, 1));
+	map1.insert(NMSP::pair<int, int>(4, 4));
+	map1.insert(NMSP::pair<int, int>(3, 3));
+	const NMSP::map<int, int>									map2(map1);
 
-	std::cout << "map1:" << expect(" [2 | 1, 4 | 3]") << std::endl;
-	print(map1); std::cout << std::endl;
-	std::cout << "const map2(map1):" << expect(" [same]") << std::endl;
-	print(map2); std::cout << std::endl;
+	std::cout << "map1: "; print(map1);
+	std::cout << std::endl;
+	std::cout << "const map2(map1): "; print(map2);
+	std::cout << std::endl;
 
 	std::cout << "map1.find(5): ";
-	if ((it = map1.find(5)) != map1.end()) std::cout << *it;
-	std::cout << expect("  [ ]") << std::endl;
+	if ((it = map1.find(5)) != map1.end()) std::cout << it->first;
+	std::cout << std::endl;
 	std::cout << "map2.find(0): ";
-	if ((const_it = map2.find(0)) != map2.end()) std::cout << *const_it;
-	std::cout << expect("  [ ]") << std::endl;
+	if ((const_it = map2.find(0)) != map2.end()) std::cout << const_it->first;
+	std::cout << std::endl;
 	std::cout << "map1.find(4): ";
-	if ((it = map1.find(4)) != map1.end()) std::cout << *it;
-	std::cout << expect(" [4]") << std::endl;
+	if ((it = map1.find(4)) != map1.end()) std::cout << it->first;
+	std::cout << std::endl;
 	std::cout << "map2.find(1): ";
-	if ((const_it = map2.find(1)) != map2.end()) std::cout << *const_it;
-	std::cout << expect(" [1]") << "\n" << std::endl;
+	if ((const_it = map2.find(1)) != map2.end()) std::cout << const_it->first;
+	std::cout << "\n" << std::endl;
 
-	std::cout << "map1.count(1): "
-		<< map1.count(1) << expect(" [1]") << std::endl;
-	std::cout << "map1.count(0): "
-		<< map1.count(0) << expect(" [0]") << std::endl;
-	std::cout << "map2.count(4): "
-		<< map2.count(4) << expect(" [1]") << std::endl;
-	std::cout << "map2.count(5): "
-		<< map2.count(5) << expect(" [0]") << "\n" << std::endl;
+	std::cout << "map1.count(1): " << map1.count(1) << std::endl;
+	std::cout << "map1.count(0): " << map1.count(0) << std::endl;
+	std::cout << "map2.count(4): " << map2.count(4) << std::endl;
+	std::cout << "map2.count(5): " << map2.count(5) << std::endl;
+	std::cout << std::endl;
 
 	std::cout << "map1.lower_bound(5): ";
 	if ((it = map1.lower_bound(5)) != map1.end())
-		std::cout << *it;
-	std::cout << expect("  [ ]") << std::endl;
+		std::cout << it->first;
+	std::cout << std::endl;
 	std::cout << "map2.lower_bound(0): ";
 	if ((const_it = map2.lower_bound(0)) != map2.end())
-		std::cout << *const_it;
-	std::cout << expect(" [1]") << std::endl;
+		std::cout << const_it->first;
+	std::cout << std::endl;
 	std::cout << "map1.lower_bound(4): ";
 	if ((it = map1.lower_bound(4)) != map1.end())
-		std::cout << *it;
-	std::cout << expect(" [4]") << std::endl;
+		std::cout << it->first;
+	std::cout << std::endl;
 	std::cout << "map2.lower_bound(1): ";
 	if ((const_it = map2.lower_bound(1)) != map2.end())
-		std::cout << *const_it;
-	std::cout << expect(" [1]") << "\n" << std::endl;
+		std::cout << const_it->first;
+	std::cout << "\n" << std::endl;
 
 	std::cout << "map1.upper_bound(5): ";
 	if ((it = map1.upper_bound(5)) != map1.end())
-		std::cout << *it;
-	std::cout << expect("  [ ]") << std::endl;
+		std::cout << it->first;
+	std::cout << std::endl;
 	std::cout << "map2.upper_bound(0): ";
 	if ((const_it = map2.upper_bound(0)) != map2.end())
-		std::cout << *const_it;
-	std::cout << expect(" [1]") << std::endl;
+		std::cout << const_it->first;
+	std::cout << std::endl;
 	std::cout << "map1.upper_bound(4): ";
 	if ((it = map1.upper_bound(4)) != map1.end())
-		std::cout << *it;
-	std::cout << expect("  [ ]") << std::endl;
+		std::cout << it->first;
+	std::cout << std::endl;
 	std::cout << "map2.upper_bound(1): ";
 	if ((const_it = map2.upper_bound(1)) != map2.end())
-		std::cout << *const_it;
-	std::cout << expect(" [2]") << "\n" << std::endl;
+		std::cout << const_it->first;
+	std::cout << "\n" << std::endl;
 
 	eq_range = map1.equal_range(5);
 	std::cout << "map1.equal_range(5): ( ";
 	if (eq_range.first != map1.end())
-		std::cout << *eq_range.first;
+		std::cout << eq_range.first->first;
 	std::cout << ", ";
 	if (eq_range.second != map1.end())
-		std::cout << *eq_range.second;
-	std::cout << ")"
-		<< expect("  [    ]") << std::endl;
+		std::cout << eq_range.second->first;
+	std::cout << ")" << std::endl;
 	const_eq_range = map2.equal_range(0);
-	std::cout << "map2.equal_range(0): (" << *const_eq_range.first
-		<< ", " << *const_eq_range.second << ")"
-		<< expect(" [1, 1]") << std::endl;
+	std::cout << "map2.equal_range(0): (" << const_eq_range.first->first
+		<< ", " << const_eq_range.second->first << ")" << std::endl;
 	eq_range = map1.equal_range(4);
-	std::cout << "map1.equal_range(4): (" << *eq_range.first << ", ";
+	std::cout << "map1.equal_range(4): (" << eq_range.first->first << ", ";
 	if (eq_range.second != map1.end())
-		std::cout << *eq_range.second;
-	std::cout << " )"
-		<< expect(" [4,  ]") << std::endl;
+		std::cout << eq_range.second->first;
+	std::cout << " )" << std::endl;
 	const_eq_range = map2.equal_range(1);
-	std::cout << "map2.equal_range(1): (" << *const_eq_range.first
-		<< ", " << *const_eq_range.second << ")"
-		<< expect(" [1, 2]") << "\n" << std::endl;
+	std::cout << "map2.equal_range(1): (" << const_eq_range.first->first
+		<< ", " << const_eq_range.second->first << ")\n" << std::endl;
 }
-*/
+
+static void	relational_operators__tests(void)
+{
+	NMSP::map<int, int>							map1;
+	map1.insert(NMSP::pair<int, int>(2, 2));
+	map1.insert(NMSP::pair<int, int>(1, 1));
+	map1.insert(NMSP::pair<int, int>(4, 4));
+	map1.insert(NMSP::pair<int, int>(3, 3));
+	const NMSP::map<int, int>					map2(map1);
+
+	std::cout << "map1: "; print(map1);
+	std::cout << "map2: "; print(map2);
+	std::cout << std::endl;
+
+	std::cout << std::boolalpha;
+	std::cout << "map1 == map2: " << (map1 == map2) << std::endl;
+	std::cout << "map1 != map2: " << (map1 != map2) << std::endl;
+	std::cout << "map1 <= map2: " << (map1 <= map2) << std::endl;
+	std::cout << "map1 >= map2: " << (map1 >= map2) << "\n" << std::endl;
+
+	std::cout << "map1[1] = 2;" << std::endl; map1[1] = 2;
+	std::cout << "map1 < map2: " << (map1 < map2) << std::endl;
+	std::cout << "map1 > map2: " << (map1 > map2) << "\n" << std::endl;
+
+	std::cout << "map1[0] = 0;" << std::endl; map1[0] = 0;
+	std::cout << "map1 <= map2: " << (map1 <= map2) << std::endl;
+	std::cout << "map1 >= map2: " << (map1 >= map2) << std::endl;
+	std::cout << std::noboolalpha << std::endl;
+}
+
 static void	speed__tests(void)
 {
+	NMSP::map<int, HeavyMap>			map1;
+	NMSP::map<int, HeavyMap>			map2;
+	HeavyMap							heavy;
+	NMSP::map<int, HeavyMap>::iterator	it;
+	int									i = 0;
+
+	for ( ; i < 5000; i += 2)
+		map1.insert(map1.begin(), NMSP::pair<const int, HeavyMap>(i, heavy));
+	for ( ; i < 10000; i += 2)
+		it = map1.insert(map1.end(), NMSP::pair<const int, HeavyMap>(i, heavy));
+	for ( ; i < 15000; i += 2)
+		it = map1.insert(it, NMSP::pair<const int, HeavyMap>(i, heavy));
+	i = 1;
+	for ( ; i < 15000; i += 2)
+		map2[i];
+	map1.insert(map2.begin(), map2.end());
+	for ( ; !map1.empty(); --i)
+		map1.erase(i);
+	map2.erase(map2.begin(), map2.end());
 }
 
 void	map__tests(bool testSpeed)
@@ -585,11 +645,13 @@ void	map__tests(bool testSpeed)
 	std::cout << success("capacity functions") << std::endl;
 	iterators__tests();
 	std::cout << success("iterators") << std::endl;
-/*	modifiers__tests();
+	modifiers__tests();
 	std::cout << success("modifier functions") << std::endl;
 	search__tests();
 	std::cout << success("search functions") << std::endl;
-*/	if (testSpeed) {
+	relational_operators__tests();
+	std::cout << success("relational operators") << std::endl;
+	if (testSpeed) {
 		speed__tests();
 		std::cout << success("speed tests") << std::endl;
 	}
