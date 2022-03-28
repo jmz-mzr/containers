@@ -12,18 +12,7 @@
 # include "reverse_iterator.hpp"
 # include "equal.hpp"
 # include "lexicographical_compare.hpp"
-
-# if (defined(__GLIBCXX__) || defined(__GLIBCPP__))
-#  define MACOS			0
-#  define LIBCPP		0
-#  define LINUX			1
-#  define LIBSTDCPP		1
-# else
-#  define MACOS			1
-#  define LIBCPP		1
-#  define LINUX			0
-#  define LIBSTDCPP		0
-# endif
+# include "detect_system.hpp"
 
 # define LENGTH_ERR		"vector"
 # define RANGE_ERR		"vector"

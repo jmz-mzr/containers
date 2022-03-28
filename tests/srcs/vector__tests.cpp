@@ -16,10 +16,10 @@
 # define NMSP	std
 #endif
 
-#if MACOS
+#ifdef __APPLE__
 # define SPEED_STRLEN		7500
 # define SPEED_VEC_SIZE		3000
-#elif LINUX
+#elif defined(__linux__)
 # define SPEED_STRLEN		5000
 # define SPEED_VEC_SIZE		1750
 #endif
