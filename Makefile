@@ -6,7 +6,7 @@
 #    By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/05 20:03:04 by jmazoyer          #+#    #+#              #
-#    Updated: 2022/03/24 11:42:42 by jmazoyer         ###   ########.fr        #
+#    Updated: 2022/03/29 19:21:14 by jmazoyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,7 +49,8 @@ SRC_NAME		=	main.cpp							\
 					reverse_iterator__tests.cpp			\
 					vector__tests.cpp					\
 					stack__tests.cpp					\
-					map__tests.cpp
+					map__tests.cpp						\
+					set__tests.cpp
 
 SRC_TREE		=	_tree__tests.cpp
 

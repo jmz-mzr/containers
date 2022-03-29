@@ -21,10 +21,10 @@ void	printSuccess(const std::string& flags)
 	std::cout << B_GREEN << "[OK]" << NO_COLOR
 		<< " All tests ran successfully!";
 	if (flags != "-v" && flags != "-a" && flags != "-s"
-			&& flags != "-m")
+			&& flags != "-m" && flags != "-set")
 		std::cout << "\nTo compare the \"ft::\" containers' speed with the"
 			" \"std::\" ones, re-run these test with\nthe corresponding flag:"
-			" -v (vector), -s (stack), -m (map), -... (...), or -a (all)";
+			" -v (vector), -s (stack), -m (map), -set (set), or -a (all)";
 	std::cout << std::endl;
 }
 
@@ -54,6 +54,8 @@ int	main(int argc, char** argv)
 	stack__tests(flags == "-s" || flags == "-a");
 	printHeader("MAP", false);
 	map__tests(flags == "-m" || flags == "-a");
+	printHeader("SET", false);
+	set__tests(flags == "-set" || flags == "-a");
 	printSuccess(flags);
 	return (0);
 }
