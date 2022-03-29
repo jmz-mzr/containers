@@ -377,7 +377,7 @@ namespace	ft
 								right(NULL), is_black(false) { }
 		_tree_node_base(const _tree_node_base&): parent(NULL), left(NULL),
 												right(NULL), is_black(false) { }
-		virtual ~_tree_node_base(void) { }
+		~_tree_node_base(void) { }
 
 		pointer		parent;
 		pointer		left;
@@ -395,13 +395,13 @@ namespace	ft
 		typedef _tree_node*			pointer;
 		typedef const _tree_node*	const_pointer;
 
-		explicit _tree_node(const T& data): data(data) { }
-		virtual ~_tree_node(void) { }
+		_tree_node(const T& data): data(data) { }
+		_tree_node(const _tree_node& src): data(src.data) { }
+		~_tree_node(void) { }
 
 		value_type		data;
 	private:
 		_tree_node(void);
-		_tree_node(const _tree_node&);
 		_tree_node&	operator=(const _tree_node&);
 	};
 
