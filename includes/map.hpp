@@ -20,7 +20,7 @@ namespace	ft
 	** "pair<const Key, T>"'s first element
 	*/
 
-	template <typename Key, typename T, typename Compare>
+	template <typename Key, typename T, class Compare>
 	class	_map_value_compare {
 	private:
 		typedef ft::pair<const Key, T>	_pair;
@@ -46,8 +46,8 @@ namespace	ft
 	/*                                MAP CLASS                               */
 	/**************************************************************************/
 
-	template <typename Key, typename T, typename Compare = std::less<Key>,
-			 typename Allocator = std::allocator<ft::pair<const Key, T> > >
+	template <typename Key, typename T, class Compare = std::less<Key>,
+			 class Allocator = std::allocator<ft::pair<const Key, T> > >
 	class	map {
 	public:
 		typedef Key										key_type;
@@ -161,13 +161,13 @@ namespace	ft
 	/*                       CONSTRUCTORS / DESTRUCTORS                       */
 	/**************************************************************************/
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	map<Key, T, Compare, Allocator>::map(const map& src): _tree(src._tree)
 	{
 		insert(src.begin(), src.end());
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	template <typename InputIt>
 	map<Key, T, Compare, Allocator>::map(InputIt first, InputIt last,
 											const key_compare& comp,
@@ -182,7 +182,7 @@ namespace	ft
 	/*                        MEMBER OPERATOR OVERLOADS                       */
 	/**************************************************************************/
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	map<Key, T, Compare, Allocator>&
 		map<Key, T, Compare, Allocator>::operator=(const map& rhs)
 	{
@@ -191,7 +191,7 @@ namespace	ft
 		return (*this);
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	typename map<Key, T, Compare, Allocator>::mapped_type&
 		map<Key, T, Compare, Allocator>::operator[](const key_type& key)
 	{
@@ -206,7 +206,7 @@ namespace	ft
 	/*                      NON-MEMBER OPERATOR OVERLOADS                     */
 	/**************************************************************************/
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	bool	operator==(const map<Key, T, Compare, Allocator>& lhs,
 						const map<Key, T, Compare, Allocator>& rhs)
 	{
@@ -214,14 +214,14 @@ namespace	ft
 					&& ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	bool	operator!=(const map<Key, T, Compare, Allocator>& lhs,
 						const map<Key, T, Compare, Allocator>& rhs)
 	{
 		return (!(lhs == rhs));
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	bool	operator<(const map<Key, T, Compare, Allocator>& lhs,
 						const map<Key, T, Compare, Allocator>& rhs)
 	{
@@ -229,21 +229,21 @@ namespace	ft
 												rhs.begin(), rhs.end()));
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	bool	operator<=(const map<Key, T, Compare, Allocator>& lhs,
 						const map<Key, T, Compare, Allocator>& rhs)
 	{
 		return (!(rhs < lhs));
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	bool	operator>(const map<Key, T, Compare, Allocator>& lhs,
 						const map<Key, T, Compare, Allocator>& rhs)
 	{
 		return (rhs < lhs);
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	bool	operator>=(const map<Key, T, Compare, Allocator>& lhs,
 						const map<Key, T, Compare, Allocator>& rhs)
 	{
@@ -254,7 +254,7 @@ namespace	ft
 	/*                            MEMBER FUNCTIONS                            */
 	/**************************************************************************/
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	template <typename InputIt>
 	void	map<Key, T, Compare, Allocator>::insert(InputIt first, InputIt last)
 	{
@@ -262,14 +262,14 @@ namespace	ft
 			insert(end, *first);
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	ft::pair<typename map<Key, T, Compare, Allocator>::iterator, bool>
 		map<Key, T, Compare, Allocator>::insert(const value_type& value)
 	{
 		return (_tree.insert_unique(value));
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	typename map<Key, T, Compare, Allocator>::iterator
 		map<Key, T, Compare, Allocator>::insert(iterator hint,
 												const value_type& value)
@@ -277,33 +277,33 @@ namespace	ft
 		return (_tree.insert_unique(hint, value));
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	void	map<Key, T, Compare, Allocator>::erase(iterator pos)
 	{
 		_tree.erase(pos);
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	typename map<Key, T, Compare, Allocator>::size_type
 		map<Key, T, Compare, Allocator>::erase(const key_type& key)
 	{
 		return (_tree.erase_unique(key));
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	void	map<Key, T, Compare, Allocator>::erase(iterator first,
 													iterator last)
 	{
 		_tree.erase(first, last);
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	void	map<Key, T, Compare, Allocator>::clear(void)
 	{
 		_tree.clear();
 	}
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	void	map<Key, T, Compare, Allocator>::swap(map& other)
 	{
 		_tree.swap(other._tree);
@@ -313,9 +313,9 @@ namespace	ft
 	/*                          NON-MEMBER FUNCTIONS                          */
 	/**************************************************************************/
 
-	template <class Key, class T, class Compare, class Allocator>
+	template <typename Key, typename T, class Compare, class Allocator>
 	void	swap(const map<Key, T, Compare, Allocator>& lhs,
-						const map<Key, T, Compare, Allocator>& rhs)
+					const map<Key, T, Compare, Allocator>& rhs)
 	{
 		lhs.swap(rhs);
 	}

@@ -39,7 +39,7 @@ static std::string	success(const char* str)
 	return (output);
 }
 
-template <typename Key, typename T, typename Comp, typename Alloc>
+template <typename Key, typename T, class Comp, class Alloc>
 static void	print(const NMSP::map<Key, T, Comp, Alloc>& map)
 {
 	typename NMSP::map<Key, T, Comp, Alloc>::const_iterator	it = map.begin();
@@ -141,7 +141,7 @@ static void	typedef__tests(void)
 	(void)q; (void)r;
 }
 
-void	constructors_destructors__tests(void)
+static void	constructors_destructors__tests(void)
 {
 //	NMSP::map<int, priv>	/* Shouldn't compile */	map0 = (std::less<int>());
 	NMSP::map<int, priv>							map0;
@@ -155,7 +155,7 @@ void	constructors_destructors__tests(void)
 	map2.insert(NMSP::make_pair(2, 'b'));
 	map2.insert(NMSP::make_pair(4, 'd'));
 	map2.insert(NMSP::make_pair(3, 'c'));
-	NMSP::map<int, char, std::less<int>,
+	const NMSP::map<int, char, std::less<int>,
 		myAlloc<NMSP::pair<const int, char> > >		map3(map2);
 	NMSP::map<int, char>							map4(map3.begin(),
 															map3.end());
@@ -175,7 +175,7 @@ void	constructors_destructors__tests(void)
 	std::cout << std::endl;
 }
 
-void	member_operators__tests(void)
+static void	member_operators__tests(void)
 {
 	NMSP::map<std::string, std::string> 	map0;
 	NMSP::map<std::string, std::string>		map1;
@@ -197,7 +197,7 @@ void	member_operators__tests(void)
 	std::cout << std::endl;
 }
 
-void	element_access__tests(void)
+static void	element_access__tests(void)
 {
 	const NMSP::map<int, int>					map0;
 	NMSP::map<int, int>							map1;
@@ -237,7 +237,7 @@ void	element_access__tests(void)
 	alloc1.deallocate(ptr, 1);
 }
 
-void	capacity__tests(void)
+static void	capacity__tests(void)
 {
 	const NMSP::map<int, int>	map1;
 	NMSP::map<int, int>			map2;
@@ -266,7 +266,7 @@ void	capacity__tests(void)
 	std::cout << "map2.size() = " << map2.size() << "\n" << std::endl;
 }
 
-void	iterators__tests(void)
+static void	iterators__tests(void)
 {
 	NMSP::map<int, int>							map1;
 	map1.insert(NMSP::make_pair(1, 1));
@@ -360,7 +360,7 @@ void	iterators__tests(void)
 	std::cout << std::endl;
 }
 
-void	modifiers__tests(void)
+static void	modifiers__tests(void)
 {
 	typedef NMSP::map<int, int>			map_t;
 
@@ -485,7 +485,7 @@ void	modifiers__tests(void)
 	std::cout << std::endl;
 }
 
-void	search__tests(void)
+static void	search__tests(void)
 {
 	typedef NMSP::map<int, int>		map_t;
 
@@ -565,7 +565,7 @@ void	search__tests(void)
 	std::cout << ", ";
 	if (eq_range.second != map1.end())
 		std::cout << eq_range.second->first;
-	std::cout << ")" << std::endl;
+	std::cout << " )" << std::endl;
 	const_eq_range = map2.equal_range(0);
 	std::cout << "map2.equal_range(0): (" << const_eq_range.first->first
 		<< ", " << const_eq_range.second->first << ")" << std::endl;
