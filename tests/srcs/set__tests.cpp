@@ -5,6 +5,7 @@
 #include "colors.hpp"
 #include "enable_if.hpp"
 #include "pair.hpp"
+#include "make_pair.hpp"
 #include "detect_system.hpp"
 
 #ifndef STD
@@ -80,6 +81,24 @@ public:
 	}
 };
 
+/*
+** Allow NMSP::pair to be used with "operator<<"
+*/
+
+template <typename T1, typename T2>
+struct	myPair: public NMSP::pair<T1, T2>
+{
+	myPair(void): NMSP::pair<T1, T2>() { }
+	myPair(const T1& x, const T2& y): NMSP::pair<T1, T2>(x, y) { }
+};
+
+template <typename T1, typename T2>
+std::ostream&	operator<<(std::ostream& os, const myPair<T1, T2>& pair)
+{
+	os << "(" << pair.first << ", " << pair.second << ")";
+	return (os);
+}
+
 /******************************************************************************/
 /*                                   TESTS                                    */
 /******************************************************************************/
@@ -142,62 +161,51 @@ static void	constructors_destructors__tests(void)
 	std::cout << "set6: "; print(set6);
 	std::cout << std::endl;
 }
-/*
+
 static void	member_operators__tests(void)
 {
-	NMSP::set<std::string, std::string> 	set0;
-	NMSP::set<std::string, std::string>		set1;
-	set1.insert(NMSP::make_pair("02", "02"));
-	set1.insert(NMSP::make_pair("01", "01"));
-	set1.insert(NMSP::make_pair("00", "00"));
-	NMSP::set<std::string, std::string> 	set2(set1);
+	const NMSP::set<std::string>	set0;
+	NMSP::set<std::string>			set1;
+	set1.insert("02");
+	set1.insert("01");
+	set1.insert("00");
+	NMSP::set<std::string> 			set2(set1);
 
 	std::cout << "set1: "; print(set1);
 	std::cout << "set2(set1): "; print(set2);
 	std::cout << "set0: "; print(set0);
 	std::cout << "set2 = set0: "; set2 = set0; print(set2);
 	std::cout << std::endl;
-
-	std::cout << "set1[\"00\"]: " << set1["00"] << std::endl;
-	std::cout << "set1[\"00\"] = \"0\": " << (set1["00"] = "0") << std::endl;
-	std::cout << "set1[\"03\"]: " << set1["03"] << std::endl;
-	std::cout << "set1: "; print(set1);
-	std::cout << std::endl;
 }
 
 static void	element_access__tests(void)
 {
-	const NMSP::set<int, int>					set0;
-	NMSP::set<int, int>							set1;
-	std::allocator<NMSP::pair<const int, int> >	alloc0(set0.get_allocator());
-	std::allocator<NMSP::pair<const int, int> >	alloc1(set1.get_allocator());
-	NMSP::pair<int, int>						pair1(0, 1);
-	NMSP::pair<int, int>						pair2(1, 1);
-	NMSP::pair<const int, int>*					ptr;
+	const NMSP::set<std::string>	set0;
+	NMSP::set<std::string>			set1;
+	std::allocator<std::string>		alloc0(set0.get_allocator());
+	std::allocator<std::string>		alloc1(set1.get_allocator());
+	std::string*					ptr;
 
 	std::cout << std::boolalpha;
-	std::cout << "set0.key_comp()(0, 1): " << set0.key_comp()(0, 1)
+	std::cout << "set0.key_comp()(\"0\", \"1\"): " << set0.key_comp()("0", "1")
 		<< std::endl;
-	std::cout << "set0.key_comp()(1, 1): " << set0.key_comp()(1, 1)
+	std::cout << "set0.key_comp()(\"1\", \"1\"): " << set0.key_comp()("1", "1")
 		<< std::endl;
-	std::cout << "set1.key_comp()(0, 1): " << set1.key_comp()(0, 1)
+	std::cout << "set1.key_comp()(\"0\", \"1\"): " << set1.key_comp()("0", "1")
 		<< std::endl;
-	std::cout << "set1.key_comp()(2, 1): " << set1.key_comp()(2, 1)
+	std::cout << "set1.key_comp()(\"2\", \"1\"): " << set1.key_comp()("2", "1")
 		<< std::endl;
 	std::cout << std::endl;
 
-	std::cout << "set0.value_comp()((0, 1), (1, 1)): "
-		<< set0.value_comp()(pair1, pair2) << std::endl;
-	pair1 = NMSP::make_pair(1, 1);
-	std::cout << "set1.value_comp()((1, 1), (1, 1)): "
-		<< set1.value_comp()(pair1, pair2) << std::endl;
-	pair1 = NMSP::make_pair(2, 1);
-	std::cout << "set0.value_comp()((1, 1), (2, 1)): "
-		<< set0.value_comp()(pair2, pair1) << std::endl;
-	pair2 = NMSP::make_pair(1, 2);
-	std::cout << "set1.value_comp()((2, 1), (1, 2)): "
-		<< set1.value_comp()(pair1, pair2) << std::endl;
-	std::cout << std::noboolalpha << std::endl;
+	std::cout << "set0.value_comp()(\"0\", \"1\"): "
+		<< set0.value_comp()("0", "1") << std::endl;
+	std::cout << "set0.value_comp()(\"1\", \"1\"): "
+		<< set0.value_comp()("1", "1") << std::endl;
+	std::cout << "set1.value_comp()(\"0\", \"1\"): "
+		<< set1.value_comp()("0", "1") << std::endl;
+	std::cout << "set1.value_comp()(\"2\", \"1\"): "
+		<< set1.value_comp()("2", "1") << std::endl;
+	std::cout << std::endl;
 
 	ptr = alloc0.allocate(1);
 	alloc0.deallocate(ptr, 1);
@@ -207,17 +215,17 @@ static void	element_access__tests(void)
 
 static void	capacity__tests(void)
 {
-	const NMSP::set<int, int>	set1;
-	NMSP::set<int, int>			set2;
+	const NMSP::set<int>	set1;
+	NMSP::set<int>			set2;
 
 	std::cout << "set1: "; print(set1);
 	std::cout << "set1.size() = " << set1.size()
 		<< ", set1.max_size() = " << set1.max_size() << "\n" << std::boolalpha
 		<< "set1.empty(): " << set1.empty() << "\n" << std::endl;
 
-	set2.insert(NMSP::make_pair(1, 1));
-	set2.insert(NMSP::make_pair(-3, -3));
-	set2.insert(NMSP::make_pair(-2, -2));
+	set2.insert(1);
+	set2.insert(-3);
+	set2.insert(-2);
 	std::cout << "set2: "; print(set2);
 	std::cout << "set2.size() = " << set2.size()
 		<< ", set2.max_size() = " << set2.max_size() << "\n" << std::endl;
@@ -236,24 +244,26 @@ static void	capacity__tests(void)
 
 static void	iterators__tests(void)
 {
-	NMSP::set<int, int>							set1;
-	set1.insert(NMSP::make_pair(1, 1));
-	set1.insert(NMSP::make_pair(2, 2));
-	const NMSP::set<int, int>					set2(set1);
-	NMSP::set<int, int>::iterator				it0;
-	NMSP::set<int, int>::const_iterator			const_it0;
-	NMSP::set<int, int>::iterator				it1(set1.end());
-	NMSP::set<int, int>::const_iterator			const_it1(set2.end());
-	NMSP::set<int, int>::iterator				it2(it0);
-	NMSP::set<int, int>::const_iterator			const_it2(it0);
-	NMSP::set<int, int>::const_iterator			const_it2_2(const_it0);
-	NMSP::set<int, int>::reverse_iterator		r_it0;
-	NMSP::set<int, int>::const_reverse_iterator	const_r_it0;
-	NMSP::set<int, int>::reverse_iterator		r_it1(set1.end());
-	NMSP::set<int, int>::const_reverse_iterator	const_r_it1(set2.end());
-	NMSP::set<int, int>::reverse_iterator		r_it2(it0);
-	NMSP::set<int, int>::const_reverse_iterator	const_r_it2(it0);
-	NMSP::set<int, int>::const_reverse_iterator	const_r_it2_2(const_it0);
+	typedef myPair<int, int>	pair_t;
+
+	NMSP::set<pair_t>							set1;
+	set1.insert(pair_t(1, 1));
+	set1.insert(pair_t(2, 2));
+	const NMSP::set<pair_t>						set2(set1);
+	NMSP::set<pair_t>::iterator					it0;
+	NMSP::set<pair_t>::const_iterator			const_it0;
+	NMSP::set<pair_t>::iterator					it1(set1.end());
+	NMSP::set<pair_t>::const_iterator			const_it1(set2.end());
+	NMSP::set<pair_t>::iterator					it2(it0);
+	NMSP::set<pair_t>::const_iterator			const_it2(it0);
+	NMSP::set<pair_t>::const_iterator			const_it2_2(const_it0);
+	NMSP::set<pair_t>::reverse_iterator			r_it0;
+	NMSP::set<pair_t>::const_reverse_iterator	const_r_it0;
+	NMSP::set<pair_t>::reverse_iterator			r_it1(set1.end());
+	NMSP::set<pair_t>::const_reverse_iterator	const_r_it1(set2.end());
+	NMSP::set<pair_t>::reverse_iterator			r_it2(it0);
+	NMSP::set<pair_t>::const_reverse_iterator	const_r_it2(it0);
+	NMSP::set<pair_t>::const_reverse_iterator	const_r_it2_2(const_it0);
 	r_it2 = r_it0;
 	const_r_it2 = r_it0;
 	const_r_it2_2 = const_r_it0;
@@ -330,71 +340,71 @@ static void	iterators__tests(void)
 
 static void	modifiers__tests(void)
 {
-	typedef NMSP::set<int, int>			set_t;
+	typedef NMSP::set<myPair<int, int> >	set_t;
 
 	NMSP::pair<set_t::iterator, bool>	inserted;
 	set_t::iterator						it;
-	NMSP::set<int, int>					set0;
-	NMSP::set<int, int>					set1;
-	NMSP::set<int, int>					set2;
+	NMSP::set<myPair<int, int> >		set0;
+	NMSP::set<myPair<int, int> >		set1;
+	NMSP::set<myPair<int, int> >		set2;
 
-	it = set0.insert(set0.begin(), NMSP::pair<const int, int>(1, 1));	// 1
+	it = set0.insert(set0.begin(), myPair<int, int>(1, 1));		// 1
 	if (it != set0.begin())
 		std::cout << "Error!" << std::endl;
-	it = set0.insert(set0.end(), NMSP::pair<const int, int>(1, 1));		// 2
-	if (*it != NMSP::pair<const int, int>(1, 1))
+	it = set0.insert(set0.end(), myPair<int, int>(1, 1));		// 2
+	if (*it != myPair<int, int>(1, 1))
 		std::cout << "Error!" << std::endl;
-	it = set0.insert(set0.end(), NMSP::pair<const int, int>(0, 0));		// 3
+	it = set0.insert(set0.end(), myPair<int, int>(0, 0));		// 3
 	if (it != set0.begin())
 		std::cout << "Error!" << std::endl;
-	it = set0.insert(set0.begin(), NMSP::pair<const int, int>(0, 0));	// 4
-	if (*it != NMSP::pair<const int, int>(0, 0))
+	it = set0.insert(set0.begin(), myPair<int, int>(0, 0));		// 4
+	if (*it != myPair<int, int>(0, 0))
 		std::cout << "Error!" << std::endl;
-	it = set0.insert(set0.begin(), NMSP::pair<const int, int>(4, 4));	// 5
+	it = set0.insert(set0.begin(), myPair<int, int>(4, 4));		// 5
 	if (it != --set0.end())
 		std::cout << "Error!" << std::endl;
 	it = --set0.end();
-	it = set0.insert(--it, NMSP::pair<const int, int>(2, 2));			// 6
-	if (*it != NMSP::pair<const int, int>(2, 2))
+	it = set0.insert(--it, myPair<int, int>(2, 2));				// 6
+	if (*it != myPair<int, int>(2, 2))
 		std::cout << "Error!" << std::endl;
-	it = set0.insert(++set0.begin(), NMSP::pair<const int, int>(2, 2));	// 7
-	if (*it != NMSP::pair<const int, int>(2, 2))
+	it = set0.insert(++set0.begin(), myPair<int, int>(2, 2));	// 7
+	if (*it != myPair<int, int>(2, 2))
 		std::cout << "Error!" << std::endl;
-	it = set0.insert(set0.end(), NMSP::pair<const int, int>(5, 5));		// 8
+	it = set0.insert(set0.end(), myPair<int, int>(5, 5));		// 8
 	if (it != --set0.end())
 		std::cout << "Error!" << std::endl;
-	it = set0.insert(--set0.end(), NMSP::pair<const int, int>(6, 6));	// 9
+	it = set0.insert(--set0.end(), myPair<int, int>(6, 6));		// 9
 	if (it != --set0.end())
 		std::cout << "Error!" << std::endl;
-	it = set0.insert(set0.begin(), NMSP::pair<const int, int>(-1, -1));	// 10
+	it = set0.insert(set0.begin(), myPair<int, int>(-1, -1));	// 10
 	if (it != set0.begin())
 		std::cout << "Error!" << std::endl;
 	it = ++set0.begin();
-	it = set0.insert(++it, NMSP::pair<const int, int>(3, 3));			// 11
-	if (*it != NMSP::pair<const int, int>(3, 3))
+	it = set0.insert(++it, myPair<int, int>(3, 3));				// 11
+	if (*it != myPair<int, int>(3, 3))
 		std::cout << "Error!" << std::endl;
-	it = set0.insert(--set0.end(), NMSP::pair<const int, int>(7, 7));	// 12
+	it = set0.insert(--set0.end(), myPair<int, int>(7, 7));		// 12
 	if (it != --set0.end())
 		std::cout << "Error!" << std::endl;
 
 	std::cout << "set0: "; print(set0);
 	std::cout << std::endl;
 
-	inserted = set1.insert(NMSP::pair<const int, int>(2, 2));
+	inserted = set1.insert(myPair<int, int>(2, 2));
 	if (inserted.first != set1.begin() || inserted.second == false)
 		std::cout << "Error!" << std::endl;
-	inserted = set1.insert(NMSP::pair<const int, int>(1, 1));
+	inserted = set1.insert(myPair<int, int>(1, 1));
 	if (inserted.first != set1.begin() || inserted.second == false)
 		std::cout << "Error!" << std::endl;
-	inserted = set1.insert(NMSP::pair<const int, int>(4, 4));
+	inserted = set1.insert(myPair<int, int>(4, 4));
 	if (inserted.first != --set1.end() || inserted.second == false)
 		std::cout << "Error!" << std::endl;
-	inserted = set1.insert(NMSP::pair<const int, int>(3, 3));
-	if (*inserted.first != NMSP::pair<const int, int>(3, 3)
+	inserted = set1.insert(myPair<int, int>(3, 3));
+	if (*inserted.first != myPair<int, int>(3, 3)
 			|| inserted.second == false)
 		std::cout << "Error!" << std::endl;
-	inserted = set1.insert(NMSP::pair<const int, int>(3, 3));
-	if (*inserted.first != NMSP::pair<const int, int>(3, 3)
+	inserted = set1.insert(myPair<int, int>(3, 3));
+	if (*inserted.first != myPair<int, int>(3, 3)
 			|| inserted.second == true)
 		std::cout << "Error!" << std::endl;
 
@@ -431,14 +441,19 @@ static void	modifiers__tests(void)
 //	set2.erase(set2.end());	// Should crash!
 	std::cout << "set2.erase(--set2.end());" << std::endl;
 	set2.erase(--set2.end());
-	std::cout << "set2.erase(4) = " << set2.erase(4) << std::endl;
-	std::cout << "set2.erase(2) = " << set2.erase(2) << std::endl;
+	std::cout << "set2.erase(4) = " << set2.erase(myPair<int, int>(4, 4))
+		<< std::endl;
+	std::cout << "set2.erase(2) = " << set2.erase(myPair<int, int>(2, 2))
+		<< std::endl;
 	std::cout << "set2: "; print(set2);
 	std::cout << std::endl;
 
-	std::cout << "set2.erase(3) = " << set2.erase(3) << std::endl;
-	std::cout << "set2.erase(1) = " << set2.erase(1) << std::endl;
-	std::cout << "set2.erase(1) = " << set2.erase(1) << std::endl;
+	std::cout << "set2.erase(3) = " << set2.erase(myPair<int, int>(3, 3))
+		<< std::endl;
+	std::cout << "set2.erase(1) = " << set2.erase(myPair<int, int>(1, 1))
+		<< std::endl;
+	std::cout << "set2.erase(1) = " << set2.erase(myPair<int, int>(1, 1))
+		<< std::endl;
 	std::cout << "set2: "; print(set2);
 	std::cout << std::endl;
 
@@ -455,18 +470,16 @@ static void	modifiers__tests(void)
 
 static void	search__tests(void)
 {
-	typedef NMSP::set<int, int>		set_t;
+	typedef NMSP::set<int>		set_t;
 
-	set_t::iterator												it;
-	set_t::const_iterator										const_it;
-	NMSP::pair<set_t::iterator, set_t::iterator>				eq_range;
-	NMSP::pair<set_t::const_iterator, set_t::const_iterator>	const_eq_range;
-	NMSP::set<int, int>											set1;
-	set1.insert(NMSP::pair<int, int>(2, 2));
-	set1.insert(NMSP::pair<int, int>(1, 1));
-	set1.insert(NMSP::pair<int, int>(4, 4));
-	set1.insert(NMSP::pair<int, int>(3, 3));
-	const NMSP::set<int, int>									set2(set1);
+	set_t::iterator									it;
+	NMSP::pair<set_t::iterator, set_t::iterator>	eq_range;
+	NMSP::set<int>									set1;
+	set1.insert(2);
+	set1.insert(1);
+	set1.insert(4);
+	set1.insert(3);
+	const NMSP::set<int>							set2(set1);
 
 	std::cout << "set1: "; print(set1);
 	std::cout << std::endl;
@@ -474,16 +487,16 @@ static void	search__tests(void)
 	std::cout << std::endl;
 
 	std::cout << "set1.find(5): ";
-	if ((it = set1.find(5)) != set1.end()) std::cout << it->first;
+	if ((it = set1.find(5)) != set1.end()) std::cout << *it;
 	std::cout << std::endl;
 	std::cout << "set2.find(0): ";
-	if ((const_it = set2.find(0)) != set2.end()) std::cout << const_it->first;
+	if ((it = set2.find(0)) != set2.end()) std::cout << *it;
 	std::cout << std::endl;
 	std::cout << "set1.find(4): ";
-	if ((it = set1.find(4)) != set1.end()) std::cout << it->first;
+	if ((it = set1.find(4)) != set1.end()) std::cout << *it;
 	std::cout << std::endl;
 	std::cout << "set2.find(1): ";
-	if ((const_it = set2.find(1)) != set2.end()) std::cout << const_it->first;
+	if ((it = set2.find(1)) != set2.end()) std::cout << *it;
 	std::cout << "\n" << std::endl;
 
 	std::cout << "set1.count(1): " << set1.count(1) << std::endl;
@@ -494,67 +507,70 @@ static void	search__tests(void)
 
 	std::cout << "set1.lower_bound(5): ";
 	if ((it = set1.lower_bound(5)) != set1.end())
-		std::cout << it->first;
+		std::cout << *it;
 	std::cout << std::endl;
 	std::cout << "set2.lower_bound(0): ";
-	if ((const_it = set2.lower_bound(0)) != set2.end())
-		std::cout << const_it->first;
+	if ((it = set2.lower_bound(0)) != set2.end())
+		std::cout << *it;
 	std::cout << std::endl;
 	std::cout << "set1.lower_bound(4): ";
 	if ((it = set1.lower_bound(4)) != set1.end())
-		std::cout << it->first;
+		std::cout << *it;
 	std::cout << std::endl;
 	std::cout << "set2.lower_bound(1): ";
-	if ((const_it = set2.lower_bound(1)) != set2.end())
-		std::cout << const_it->first;
+	if ((it = set2.lower_bound(1)) != set2.end())
+		std::cout << *it;
 	std::cout << "\n" << std::endl;
 
 	std::cout << "set1.upper_bound(5): ";
 	if ((it = set1.upper_bound(5)) != set1.end())
-		std::cout << it->first;
+		std::cout << *it;
 	std::cout << std::endl;
 	std::cout << "set2.upper_bound(0): ";
-	if ((const_it = set2.upper_bound(0)) != set2.end())
-		std::cout << const_it->first;
+	if ((it = set2.upper_bound(0)) != set2.end())
+		std::cout << *it;
 	std::cout << std::endl;
 	std::cout << "set1.upper_bound(4): ";
 	if ((it = set1.upper_bound(4)) != set1.end())
-		std::cout << it->first;
+		std::cout << *it;
 	std::cout << std::endl;
 	std::cout << "set2.upper_bound(1): ";
-	if ((const_it = set2.upper_bound(1)) != set2.end())
-		std::cout << const_it->first;
+	if ((it = set2.upper_bound(1)) != set2.end())
+		std::cout << *it;
 	std::cout << "\n" << std::endl;
 
 	eq_range = set1.equal_range(5);
 	std::cout << "set1.equal_range(5): ( ";
 	if (eq_range.first != set1.end())
-		std::cout << eq_range.first->first;
+		std::cout << *eq_range.first;
 	std::cout << ", ";
 	if (eq_range.second != set1.end())
-		std::cout << eq_range.second->first;
-	std::cout << ")" << std::endl;
-	const_eq_range = set2.equal_range(0);
-	std::cout << "set2.equal_range(0): (" << const_eq_range.first->first
-		<< ", " << const_eq_range.second->first << ")" << std::endl;
-	eq_range = set1.equal_range(4);
-	std::cout << "set1.equal_range(4): (" << eq_range.first->first << ", ";
-	if (eq_range.second != set1.end())
-		std::cout << eq_range.second->first;
+		std::cout << *eq_range.second;
 	std::cout << " )" << std::endl;
-	const_eq_range = set2.equal_range(1);
-	std::cout << "set2.equal_range(1): (" << const_eq_range.first->first
-		<< ", " << const_eq_range.second->first << ")\n" << std::endl;
+	eq_range = set2.equal_range(0);
+	std::cout << "set2.equal_range(0): (" << *eq_range.first
+		<< ", " << *eq_range.second << ")" << std::endl;
+	eq_range = set1.equal_range(4);
+	std::cout << "set1.equal_range(4): (" << *eq_range.first << ", ";
+	if (eq_range.second != set1.end())
+		std::cout << *eq_range.second;
+	std::cout << " )" << std::endl;
+	eq_range = set2.equal_range(1);
+	std::cout << "set2.equal_range(1): (" << *eq_range.first
+		<< ", " << *eq_range.second << ")\n" << std::endl;
+
+//	it = set1.begin();
+//	*it = 2; // Shouldn't compile!
 }
 
 static void	relational_operators__tests(void)
 {
-	NMSP::set<int, int>							set1;
-	set1.insert(NMSP::pair<int, int>(2, 2));
-	set1.insert(NMSP::pair<int, int>(1, 1));
-	set1.insert(NMSP::pair<int, int>(4, 4));
-	set1.insert(NMSP::pair<int, int>(3, 3));
-	const NMSP::set<int, int>					set2(set1);
+	NMSP::set<int>			set1;
+	set1.insert(2);
+	set1.insert(1);
+	set1.insert(4);
+	set1.insert(3);
+	const NMSP::set<int>	set2(set1);
 
 	std::cout << "set1: "; print(set1);
 	std::cout << "set2: "; print(set2);
@@ -566,37 +582,96 @@ static void	relational_operators__tests(void)
 	std::cout << "set1 <= set2: " << (set1 <= set2) << std::endl;
 	std::cout << "set1 >= set2: " << (set1 >= set2) << "\n" << std::endl;
 
-	std::cout << "set1[1] = 2;" << std::endl; set1[1] = 2;
+	std::cout << "set1.erase(2);" << std::endl; set1.erase(2);
 	std::cout << "set1 < set2: " << (set1 < set2) << std::endl;
 	std::cout << "set1 > set2: " << (set1 > set2) << "\n" << std::endl;
 
-	std::cout << "set1[0] = 0;" << std::endl; set1[0] = 0;
+	std::cout << "set1.insert(0);" << std::endl; set1.insert(0);
 	std::cout << "set1 <= set2: " << (set1 <= set2) << std::endl;
 	std::cout << "set1 >= set2: " << (set1 >= set2) << std::endl;
 	std::cout << std::noboolalpha << std::endl;
 }
+/*
+static void	speed__tests(void)
+{
+	NMSP::set<std::vector<int> >			set1;
+	NMSP::set<std::vector<int> >			set2;
+	NMSP::set<std::vector<int> >::iterator	it;
+	int										i = 0;
+
+	for ( ; i < 5000; i += 2)
+		set1.insert(set1.begin(), std::vector<int>(i, i));
+	for ( ; i < 10000; i += 2)
+		it = set1.insert(set1.end(), std::vector<int>(i, i));
+	for ( ; i < 15000; i += 2)
+		it = set1.insert(it, std::vector<int>(i, i));
+	i = 1;
+	for ( ; i < 15000; i += 2)
+		set2.insert(std::vector<int>(i, i));
+	set1.insert(set2.begin(), set2.end());
+	for ( ; !set1.empty(); --i)
+		set1.erase(set1.begin());
+	set2.erase(set2.begin(), set2.end());
+}
+*/
+/*
+#include <sstream>
+static void	speed__tests(void)
+{
+	NMSP::set<std::string>				set1;
+	NMSP::set<std::string>				set2;
+	std::ostringstream					digit;
+	NMSP::set<std::string>::iterator	it;
+	int									i = 0;
+
+	for ( ; i < 500000; i += 2) {
+		digit << i; set1.insert(set1.begin(), std::string(digit.str()));
+		digit.seekp(0);
+	}
+	for ( ; i < 1000000; i += 2) {
+		digit << i; it = set1.insert(set1.end(), std::string(digit.str()));
+		digit.seekp(0);
+	}
+	for ( ; i < 1500000; i += 2) {
+		digit << i; it = set1.insert(it, std::string(digit.str()));
+		digit.seekp(0);
+	}
+	digit.str("");
+	i = 1;
+	for ( ; i < 1500000; i += 2) {
+		digit << i; set1.insert(std::string(digit.str()));
+		digit.seekp(0);
+	}
+	set1.insert(set2.begin(), set2.end());
+	digit.str("");
+	i = 0;
+	for ( ; !set1.empty(); ++i) {
+		digit << i; set1.erase(std::string(digit.str()));
+		digit.seekp(0);
+	}
+	set2.erase(set2.begin(), set2.end());
+}
 */
 static void	speed__tests(void)
 {
-//	NMSP::set<int, Heavyset>			set1;
-//	NMSP::set<int, Heavyset>			set2;
-//	Heavyset							heavy;
-//	NMSP::set<int, Heavyset>::iterator	it;
-//	int									i = 0;
-//
-//	for ( ; i < 5000; i += 2)
-//		set1.insert(set1.begin(), NMSP::pair<const int, Heavyset>(i, heavy));
-//	for ( ; i < 10000; i += 2)
-//		it = set1.insert(set1.end(), NMSP::pair<const int, Heavyset>(i, heavy));
-//	for ( ; i < 15000; i += 2)
-//		it = set1.insert(it, NMSP::pair<const int, Heavyset>(i, heavy));
-//	i = 1;
-//	for ( ; i < 15000; i += 2)
-//		set2[i];
-//	set1.insert(set2.begin(), set2.end());
-//	for ( ; !set1.empty(); --i)
-//		set1.erase(i);
-//	set2.erase(set2.begin(), set2.end());
+	NMSP::set<int>				set1;
+	NMSP::set<int>				set2;
+	NMSP::set<int>::iterator	it;
+	int							i = 0;
+
+	for ( ; i < 1000000; i += 2)
+		set1.insert(set1.begin(), i);
+	for ( ; i < 1500000; i += 2)
+		it = set1.insert(set1.end(), i);
+	for ( ; i < 2000000; i += 2)
+		it = set1.insert(it, i);
+	i = 1;
+	for ( ; i < 2000000; i += 2)
+		set1.insert(i);
+	set1.insert(set2.begin(), set2.end());
+	for ( ; !set1.empty(); --i)
+		set1.erase(i);
+	set2.erase(set2.begin(), set2.end());
 }
 
 void	set__tests(bool testSpeed)
@@ -605,7 +680,7 @@ void	set__tests(bool testSpeed)
 	std::cout << success("typedefs") << std::endl;
 	constructors_destructors__tests();
 	std::cout << success("constructors & destructors") << std::endl;
-/*	member_operators__tests();
+	member_operators__tests();
 	std::cout << success("member operators") << std::endl;
 	element_access__tests();
 	std::cout << success("element access functions") << std::endl;
@@ -619,7 +694,7 @@ void	set__tests(bool testSpeed)
 	std::cout << success("search functions") << std::endl;
 	relational_operators__tests();
 	std::cout << success("relational operators") << std::endl;
-*/	if (testSpeed) {
+	if (testSpeed) {
 		speed__tests();
 		std::cout << success("speed tests") << std::endl;
 	}
