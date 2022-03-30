@@ -375,8 +375,6 @@ namespace	ft
 
 		_tree_node_base(void): parent(NULL), left(NULL),
 								right(NULL), is_black(false) { }
-		_tree_node_base(const _tree_node_base&): parent(NULL), left(NULL),
-												right(NULL), is_black(false) { }
 		~_tree_node_base(void) { }
 
 		pointer		parent;
@@ -384,6 +382,7 @@ namespace	ft
 		pointer		right;
 		bool		is_black;
 	private:
+		_tree_node_base(const _tree_node_base&);
 		_tree_node_base&	operator=(const _tree_node_base&);
 	};
 
@@ -395,7 +394,7 @@ namespace	ft
 		typedef _tree_node*			pointer;
 		typedef const _tree_node*	const_pointer;
 
-		_tree_node(const T& data): data(data) { }
+		explicit _tree_node(const T& data): data(data) { }
 		_tree_node(const _tree_node& src): data(src.data) { }
 		~_tree_node(void) { }
 
@@ -548,13 +547,15 @@ namespace	ft
 										_end_node_ptr(NULL)
 	{
 		_end_node_ptr = _node_base_alloc.allocate(1);
-		_node_base_alloc.construct(_end_node_ptr, node_base());
+		_end_node_ptr->parent = NULL;
+		_end_node_ptr->left = NULL;
+		_end_node_ptr->right = NULL;
+		_end_node_ptr->is_black = false;
 	}
 
 	template <class Allocator>
 	_tree_base<Allocator>::~_tree_base(void)
 	{
-		_node_base_alloc.destroy(_end_node_ptr);
 		_node_base_alloc.deallocate(_end_node_ptr, 1);
 		_end_node_ptr = NULL;
 	}
@@ -598,8 +599,8 @@ namespace	ft
 
 		const value_compare&	value_comp(void) const { return (_comp); }
 		const node_allocator&	node_alloc(void) const { return (_node_alloc); }
-		allocator_type			alloc(void) const
-									{ return (allocator_type(_node_alloc)); }
+		const allocator_type&	alloc(void) const
+									{ return (_alloc); }
 
 		const size_type&	size(void) const { return (_size); }
 		size_type			max_size(void) const
@@ -624,10 +625,11 @@ namespace	ft
 									{ return (const_iterator(end_node())); }
 
 		ft::pair<iterator, bool>	insert_unique(const value_type& value);
-		iterator					insert_unique(iterator hint,
+		iterator					insert_unique(const_iterator hint,
 													const value_type& value);
-		void						erase(iterator pos);
-		void						erase(iterator first, iterator last);
+		void						erase(const_iterator pos);
+		void						erase(const_iterator first,
+											const_iterator last);
 		template <typename Key>
 		size_type					erase_unique(const Key& key);
 		void						clear(void);
@@ -683,6 +685,7 @@ namespace	ft
 									unsigned indent, unsigned padding) const;
 
 		value_compare		_comp;
+		allocator_type		_alloc;
 		node_allocator		_node_alloc;
 		size_type			_size;
 		node_base_pointer	_begin_node_ptr;
@@ -695,6 +698,7 @@ namespace	ft
 	template <typename T, class Compare, class Allocator>
 	_tree<T, Compare, Allocator>::_tree(void): _base(),
 												_comp(),
+												_alloc(),
 												_node_alloc(),
 												_size(0),
 												_begin_node_ptr(NULL)
@@ -706,6 +710,7 @@ namespace	ft
 	_tree<T, Compare, Allocator>::_tree(const value_compare& comp):
 												_base(),
 												_comp(comp),
+												_alloc(),
 												_node_alloc(),
 												_size(0),
 												_begin_node_ptr(NULL)
@@ -718,6 +723,7 @@ namespace	ft
 											const allocator_type& alloc):
 												_base(),
 												_comp(comp),
+												_alloc(alloc),
 												_node_alloc(alloc),
 												_size(0),
 												_begin_node_ptr(NULL)
@@ -729,6 +735,7 @@ namespace	ft
 	_tree<T, Compare, Allocator>::_tree(const _tree& src):
 												_base(),
 												_comp(src._comp),
+												_alloc(src._alloc),
 												_node_alloc(src._node_alloc),
 												_size(0),
 												_begin_node_ptr(NULL)
@@ -748,6 +755,7 @@ namespace	ft
 		if (this != &rhs) {
 			clear();
 			_comp = rhs._comp;
+			_alloc = rhs._alloc;
 			_node_alloc = rhs._node_alloc;
 			_assign_tree(rhs);
 		}
@@ -776,7 +784,7 @@ namespace	ft
 		node_pointer	new_node = _node_alloc.allocate(1);
 
 		try {
-			_node_alloc.construct(new_node, src_node->data);
+			_node_alloc.construct(new_node, *src_node);
 		} catch (...) {
 			_node_alloc.deallocate(new_node, 1);
 			throw ;
@@ -831,7 +839,7 @@ namespace	ft
 		node_pointer	node = _node_alloc.allocate(1);
 
 		try {
-			_node_alloc.construct(node, value);
+			_alloc.construct(&(node->data), value);
 		} catch (...) {
 			_node_alloc.deallocate(node, 1);
 			throw ;
@@ -851,9 +859,9 @@ namespace	ft
 	}
 
 	template <typename T, class Compare, class Allocator>
-	void	_tree<T, Compare, Allocator>::erase(iterator pos)
+	void	_tree<T, Compare, Allocator>::erase(const_iterator pos)
 	{
-		node_base_pointer	node = pos.get_ptr();
+		node_base_pointer	node = const_cast<node_base_pointer>(pos.get_ptr());
 
 		if (node == _begin_node())
 			_begin_node() = _tree_next(node);
@@ -864,7 +872,8 @@ namespace	ft
 	}
 
 	template <typename T, class Compare, class Allocator>
-	void	_tree<T, Compare, Allocator>::erase(iterator first, iterator last)
+	void	_tree<T, Compare, Allocator>::erase(const_iterator first,
+													const_iterator last)
 	{
 		if (first == begin() && last == end())
 			clear();
@@ -952,7 +961,7 @@ namespace	ft
 			_begin_node() = _begin_node()->left;
 		_tree_insert_rebalance(end_node()->left, child);
 		++_size;
-		return (iterator(child));
+		return (iterator(new_node));
 	}
 
 	template <typename T, class Compare, class Allocator>
@@ -1028,21 +1037,22 @@ namespace	ft
 	}
 	template <typename T, class Compare, class Allocator>
 	typename _tree<T, Compare, Allocator>::iterator
-		_tree<T, Compare, Allocator>::insert_unique(iterator hint,
+		_tree<T, Compare, Allocator>::insert_unique(const_iterator hint,
 													const value_type& value)
 	{
-		iterator			prev = hint;
+		iterator			pos(const_cast<node_base_pointer>(hint.get_ptr()));
+		iterator			prev = pos;
 		node_base_pointer	parent;
 
-		if (hint != end() && _comp(*hint, value))
-			return (_insert_unique_after(hint, value));
-		else if (hint == end() && hint == begin()) {
-			parent = hint.get_ptr();
+		if (pos != end() && _comp(*pos, value))
+			return (_insert_unique_after(pos, value));
+		else if (pos == end() && pos == begin()) {
+			parent = pos.get_ptr();
 			return (_insert_node_at(parent, parent->left,
 						_construct_node(value)));
-		} else if (hint == end() || _comp(value, *hint))
-			return (_insert_unique_before(hint, value));
-		return (hint);
+		} else if (pos == end() || _comp(value, *pos))
+			return (_insert_unique_before(pos, value));
+		return (pos);
 	}
 
 	template <typename T, class Compare, class Allocator>

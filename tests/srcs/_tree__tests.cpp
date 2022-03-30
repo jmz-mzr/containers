@@ -3,6 +3,7 @@
 #include <memory>
 #include <iostream>
 #include <functional>
+#include <vector>
 #include "_tree.hpp"
 #include "colors.hpp"
 #include "pair.hpp"
@@ -63,7 +64,7 @@ std::string	expect(const char* str)
 
 /*
 ** Create a type that cannot be default constructed to test if the _tree
-** can still be created
+** can still be empty created
 */
 
 class	priv {
@@ -71,25 +72,7 @@ class	priv {
 };
 
 /*
-** Allow ft::pair to be used with "operator<<"
-*/
-
-template <typename T1, typename T2>
-struct	myPair: public ft::pair<T1, T2>
-{
-	myPair(void): ft::pair<T1, T2>() { }
-	myPair(const T1& x, const T2& y): ft::pair<T1, T2>(x, y) { }
-};
-
-template <typename T1, typename T2>
-std::ostream&	operator<<(std::ostream& os, const myPair<T1, T2>& pair)
-{
-	os << "(" << pair.first << ", " << pair.second << ")";
-	return (os);
-}
-
-/*
-** Use a custom allocator to test with the _tree class
+** Create a custom allocator to test with the _tree class
 */
 
 template <typename T>
@@ -116,25 +99,75 @@ public:
 	}
 };
 
+/*
+** Allow std::vector to be used with "operator<<"
+*/
+
+template <typename T>
+struct	myVec: public std::vector<T>
+{
+	myVec(void): std::vector<T>() { }
+	myVec(const myVec& src): std::vector<T>(src) { }
+	myVec(size_t n, const T& val): std::vector<T>(n, val) { }
+	template <typename InputIt>
+	myVec(InputIt first, InputIt last): std::vector<T>(first, last) { }
+};
+
+template <typename T>
+std::ostream&	operator<<(std::ostream& os, const myVec<T>& vec)
+{
+	typename std::vector<T>::const_iterator it = vec.begin();
+
+	os << "[";
+	while (it != vec.end()) {
+		os << *it;
+		if (++it != vec.end())
+			os << ", ";
+	}
+	os << "]";
+	return (os);
+}
+
+/*
+** Allow ft::pair to be used with "operator<<"
+*/
+
+template <typename T1, typename T2>
+struct	myPair: public ft::pair<T1, T2>
+{
+	myPair(void): ft::pair<T1, T2>() { }
+	myPair(const T1& x, const T2& y): ft::pair<T1, T2>(x, y) { }
+};
+
+template <typename T1, typename T2>
+std::ostream&	operator<<(std::ostream& os, const myPair<T1, T2>& pair)
+{
+	os << "(" << pair.first << ", " << pair.second << ")";
+	return (os);
+}
+
 /******************************************************************************/
 /*                                   TESTS                                    */
 /******************************************************************************/
 
 void	constructors_destructors__tests(void)
 {
-	ft::_tree<priv, std::less<priv>, myAlloc<priv> >		tree0;
-	ft::_tree<int, std::less<int>, std::allocator<int> >	tree1
-														((std::less<int>()));
-	ft::_tree<int, std::less<int>, myAlloc<int> >			tree2
-														((std::less<int>()),
-														myAlloc<int>());
-	tree2.insert_unique(1);
-	tree2.insert_unique(2);
-	tree2.insert_unique(4);
-	tree2.insert_unique(3);
-	ft::_tree<int, std::less<int>, myAlloc<int> >			tree3(tree2);
+	typedef myVec<char>		vec_t;
 
-	std::cout << "tree2:" << expect(" [2 | 1, 4 | 3]") << std::endl;
+	ft::_tree<priv, std::less<priv>, myAlloc<priv> >		tree0;
+	ft::_tree<vec_t, std::less<vec_t>,
+				std::allocator<vec_t> >						tree1
+														((std::less<vec_t>()));
+	ft::_tree<vec_t, std::less<vec_t>, myAlloc<vec_t> >		tree2
+														((std::less<vec_t>()),
+														myAlloc<vec_t>());
+	tree2.insert_unique(vec_t(1, 'a'));
+	tree2.insert_unique(vec_t(1, 'b'));
+	tree2.insert_unique(vec_t(1, 'd'));
+	tree2.insert_unique(vec_t(1, 'c'));
+	ft::_tree<vec_t, std::less<vec_t>, myAlloc<vec_t> >		tree3(tree2);
+
+	std::cout << "tree2:" << expect(" [b | a, d | c]") << std::endl;
 	tree2.print(); std::cout << std::endl;
 	std::cout << "tree3(tree2):" << expect(" [same]") << std::endl;
 	tree3.print(); std::cout << std::endl;
@@ -502,8 +535,8 @@ void	search__tests(void)
 	std::cout << ", ";
 	if (eq_range.second != tree1.end())
 		std::cout << *eq_range.second;
-	std::cout << ")"
-		<< expect("  [    ]") << std::endl;
+	std::cout << " )"
+		<< expect(" [    ]") << std::endl;
 	const_eq_range = tree2.equal_range_unique(0);
 	std::cout << "tree2.equal_range_unique(0): (" << *const_eq_range.first
 		<< ", " << *const_eq_range.second << ")"
