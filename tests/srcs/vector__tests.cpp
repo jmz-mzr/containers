@@ -17,8 +17,8 @@
 #endif
 
 #ifdef __APPLE__
-# define SPEED_STRLEN		7500
-# define SPEED_VEC_SIZE		3000
+# define SPEED_STRLEN		6000
+# define SPEED_VEC_SIZE		2000
 #elif defined(__linux__)
 # define SPEED_STRLEN		5000
 # define SPEED_VEC_SIZE		1750
@@ -536,9 +536,12 @@ static void	modifiers__tests(void)
 
 static void	speed__tests(void)
 {
-	NMSP::vector<HeavyVec>		vec1(100);
-	NMSP::vector<HeavyVec>		vec2;
-	HeavyVec					heavy('+');
+	NMSP::vector<HeavyVec>				vec1(100);
+	NMSP::vector<HeavyVec>				vec2;
+	HeavyVec							heavy('+');
+	std::string							str(SPEED_STRLEN, '-');
+	NMSP::vector<std::string>			vec3;
+	NMSP::vector<std::string>::iterator	it;
 
 	vec2.assign(vec1.begin(), vec1.end());
 	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
@@ -546,6 +549,11 @@ static void	speed__tests(void)
 	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
 	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
 	vec2.insert(vec2.begin() + (vec2.size() / 2), 20, heavy);
+	for (int i = 0; i != 200; ++i)
+		vec3.insert(vec3.begin() + vec3.size() / 2, 20, str);
+	it = vec3.begin();
+	while (it != vec3.end())
+		it = vec3.erase(it);
 }
 
 void	vector__tests(bool testSpeed)

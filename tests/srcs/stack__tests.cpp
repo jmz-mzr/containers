@@ -16,8 +16,8 @@
 #endif
 
 #ifdef __APPLE__
-# define SPEED_STRLEN		7500
-# define SPEED_VEC_SIZE		3000
+# define SPEED_STRLEN		3000
+# define SPEED_VEC_SIZE		1500
 #elif defined(__linux__)
 # define SPEED_STRLEN		5000
 # define SPEED_VEC_SIZE		2000
@@ -194,9 +194,10 @@ static void	speed__tests(void)
 		size = stack.size();
 		(void)size;
 		tmp = stack.top();
-		stack.push(tmp);
-		stack.pop();
-		stack.pop();
+		for (int i = 0; i != 41; ++i)
+			stack.push(tmp);
+		for (int i = 0; i != 42; ++i)
+			stack.pop();
 	}
 }
 

@@ -14,13 +14,8 @@
 # define NMSP	std
 #endif
 
-#ifdef __APPLE__
-# define SPEED_STRLEN		400
-# define SPEED_VEC_SIZE		300
-#elif defined(__linux__)
-# define SPEED_STRLEN		300
-# define SPEED_VEC_SIZE		200
-#endif
+#define SPEED_STRLEN		300
+#define SPEED_VEC_SIZE		200
 
 /******************************************************************************/
 /*                            TEMPLATES / FUNCTIONS                           */
@@ -60,6 +55,35 @@ static void	print(const NMSP::map<Key, T, Comp, Alloc>& map)
 class	priv {
 	priv(void);
 };
+
+/*
+** Allow std::vector to be used with "operator<<"
+*/
+
+template <typename T>
+struct	myVec: public std::vector<T>
+{
+	myVec(void): std::vector<T>() { }
+	myVec(const myVec& src): std::vector<T>(src) { }
+	myVec(size_t n, const T& val): std::vector<T>(n, val) { }
+	template <typename InputIt>
+	myVec(InputIt first, InputIt last): std::vector<T>(first, last) { }
+};
+
+template <typename T>
+std::ostream&	operator<<(std::ostream& os, const myVec<T>& vec)
+{
+	typename std::vector<T>::const_iterator it = vec.begin();
+
+	os << "[";
+	while (it != vec.end()) {
+		os << *it;
+		if (++it != vec.end())
+			os << ", ";
+	}
+	os << "]";
+	return (os);
+}
 
 /*
 ** Use a custom allocator to test with the _tree class
@@ -143,35 +167,38 @@ static void	typedef__tests(void)
 
 static void	constructors_destructors__tests(void)
 {
+	typedef myVec<char>		vec_t;
+
 //	NMSP::map<int, priv>	/* Shouldn't compile */	map0 = (std::less<int>());
-	NMSP::map<int, priv>							map0;
-	NMSP::map<int, char, std::less<int> >			map1
-													((std::less<int>()));
-	NMSP::map<int, char, std::less<int>,
-		myAlloc<NMSP::pair<const int, char> > >		map2
-													((std::less<int>()),
-													myAlloc<int>());
-	map2.insert(NMSP::make_pair(1, 'a'));
-	map2.insert(NMSP::make_pair(2, 'b'));
-	map2.insert(NMSP::make_pair(4, 'd'));
-	map2.insert(NMSP::make_pair(3, 'c'));
-	const NMSP::map<int, char, std::less<int>,
-		myAlloc<NMSP::pair<const int, char> > >		map3(map2);
-	NMSP::map<int, char>							map4(map3.begin(),
+	NMSP::map<vec_t, priv>							map0;
+	NMSP::map<vec_t, int, std::less<vec_t> >		map1
+													((std::less<vec_t>()));
+	NMSP::map<vec_t, int, std::less<vec_t>,
+		myAlloc<NMSP::pair<const vec_t, int> > >	map2
+													((std::less<vec_t>()),
+													myAlloc<vec_t>());
+	map2.insert(NMSP::make_pair(vec_t(1, 'a'), 'a'));
+	map2.insert(NMSP::make_pair(vec_t(2, 'b'), 'b'));
+	map2.insert(NMSP::make_pair(vec_t(4, 'd'), 'd'));
+	map2.insert(NMSP::make_pair(vec_t(3, 'c'), 'c'));
+	const NMSP::map<vec_t, int, std::less<vec_t>,
+		myAlloc<NMSP::pair<const vec_t, int> > >	map3(map2);
+	NMSP::map<vec_t, int>							map4(map3.begin(),
 															map3.end());
-	NMSP::map<int, char>							map5(map3.begin(),
+	NMSP::map<vec_t, int>							map5(map3.begin(),
 															map3.end(),
-														((std::less<int>())));
-	NMSP::map<int, char>							map6(map3.begin(),
+														((std::less<vec_t>())));
+	NMSP::map<vec_t, int>							map6(map3.begin(),
 															map3.end(),
-														((std::less<int>())),
-														myAlloc<int>());
+														((std::less<vec_t>())),
+														myAlloc<vec_t>());
 
 	std::cout << "map2: "; print(map2);
 	std::cout << "map3(map2): "; print(map3);
 	std::cout << "map4: "; print(map4);
 	std::cout << "map5: "; print(map5);
 	std::cout << "map6: "; print(map6);
+	map2.erase(map2.begin());
 	std::cout << std::endl;
 }
 
@@ -616,19 +643,22 @@ static void	speed__tests(void)
 	NMSP::map<int, HeavyMap>::iterator	it;
 	int									i = 0;
 
-	for ( ; i < 5000; i += 2)
+	for ( ; i < 25000; i += 2)
 		map1.insert(map1.begin(), NMSP::pair<const int, HeavyMap>(i, heavy));
-	for ( ; i < 10000; i += 2)
+	for ( ; i < 30000; i += 2)
 		it = map1.insert(map1.end(), NMSP::pair<const int, HeavyMap>(i, heavy));
-	for ( ; i < 15000; i += 2)
+	for ( ; i < 35000; i += 2)
 		it = map1.insert(it, NMSP::pair<const int, HeavyMap>(i, heavy));
 	i = 1;
-	for ( ; i < 15000; i += 2)
+	for ( ; i < 35000; i += 2)
 		map2[i];
 	map1.insert(map2.begin(), map2.end());
 	for ( ; !map1.empty(); --i)
 		map1.erase(i);
-	map2.erase(map2.begin(), map2.end());
+	map1.insert(map2.begin(), map2.end());
+	map1.erase(map1.begin(), map1.end());
+	for ( ; !map2.empty(); --i)
+		map2.erase(map2.begin());
 }
 
 void	map__tests(bool testSpeed)

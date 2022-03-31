@@ -14,6 +14,12 @@
 # define NMSP	std
 #endif
 
+#ifdef __APPLE__
+# define SPEED_SET			3500000
+#elif defined(__linux__)
+# define SPEED_SET			4500000
+#endif
+
 /******************************************************************************/
 /*                            TEMPLATES / FUNCTIONS                           */
 /******************************************************************************/
@@ -52,6 +58,35 @@ static void	print(const NMSP::set<Key, Comp, Alloc>& set)
 class	priv {
 	priv(void);
 };
+
+/*
+** Allow std::vector to be used with "operator<<"
+*/
+
+template <typename T>
+struct	myVec: public std::vector<T>
+{
+	myVec(void): std::vector<T>() { }
+	myVec(const myVec& src): std::vector<T>(src) { }
+	myVec(size_t n, const T& val): std::vector<T>(n, val) { }
+	template <typename InputIt>
+	myVec(InputIt first, InputIt last): std::vector<T>(first, last) { }
+};
+
+template <typename T>
+std::ostream&	operator<<(std::ostream& os, const myVec<T>& vec)
+{
+	typename std::vector<T>::const_iterator it = vec.begin();
+
+	os << "[";
+	while (it != vec.end()) {
+		os << *it;
+		if (++it != vec.end())
+			os << ", ";
+	}
+	os << "]";
+	return (os);
+}
 
 /*
 ** Use a custom allocator to test with the _tree class
@@ -132,33 +167,37 @@ static void	typedef__tests(void)
 
 static void	constructors_destructors__tests(void)
 {
+	typedef myVec<char>		vec_t;
+
 //	NMSP::set<int> 		/*Shouldn't compile*/		set00 = (std::less<int>());
 	NMSP::set<priv>									set0;
-	NMSP::set<int, std::less<int> >					set1((std::less<int>()));
-	NMSP::set<int, std::less<int>, myAlloc<int> >	set2
-													((std::less<int>()),
-													myAlloc<int>());
-	set2.insert(1);
-	set2.insert(2);
-	set2.insert(4);
-	set2.insert(3);
-	const NMSP::set<int, std::less<int>,
-		  						myAlloc<int> >		set3(set2);
-	NMSP::set<int>									set4(set3.begin(),
+	NMSP::set<vec_t, std::less<vec_t> >				set1((std::less<vec_t>()));
+	NMSP::set<vec_t, std::less<vec_t>,
+				myAlloc<vec_t> >	set2
+													((std::less<vec_t>()),
+													myAlloc<vec_t>());
+	set2.insert(vec_t(1, 'a'));
+	set2.insert(vec_t(2, 'b'));
+	set2.insert(vec_t(4, 'd'));
+	set2.insert(vec_t(3, 'c'));
+	const NMSP::set<vec_t, std::less<vec_t>,
+		  						myAlloc<vec_t> >	set3(set2);
+	NMSP::set<vec_t>								set4(set3.begin(),
 															set3.end());
-	NMSP::set<int>									set5(set3.begin(),
+	NMSP::set<vec_t>								set5(set3.begin(),
 															set3.end(),
-														((std::less<int>())));
-	NMSP::set<int>									set6(set3.begin(),
+														((std::less<vec_t>())));
+	NMSP::set<vec_t>								set6(set3.begin(),
 															set3.end(),
-														((std::less<int>())),
-														myAlloc<int>());
+														((std::less<vec_t>())),
+														myAlloc<vec_t>());
 
 	std::cout << "set2: "; print(set2);
 	std::cout << "set3(set2): "; print(set3);
 	std::cout << "set4: "; print(set4);
 	std::cout << "set5: "; print(set5);
 	std::cout << "set6: "; print(set6);
+	set2.erase(set2.begin());
 	std::cout << std::endl;
 }
 
@@ -215,22 +254,23 @@ static void	element_access__tests(void)
 
 static void	capacity__tests(void)
 {
-	const NMSP::set<int>	set1;
-	NMSP::set<int>			set2;
+	const NMSP::set<myPair<int, int> >	set1;
+	NMSP::set<myPair<int, int> >		set2;
 
 	std::cout << "set1: "; print(set1);
 	std::cout << "set1.size() = " << set1.size()
 		<< ", set1.max_size() = " << set1.max_size() << "\n" << std::boolalpha
 		<< "set1.empty(): " << set1.empty() << "\n" << std::endl;
 
-	set2.insert(1);
-	set2.insert(-3);
-	set2.insert(-2);
+	set2.insert(myPair<int, int>(1, 1));
+	set2.insert(myPair<int, int>(-3, -3));
+	set2.insert(myPair<int, int>(-2, -2));
 	std::cout << "set2: "; print(set2);
 	std::cout << "set2.size() = " << set2.size()
 		<< ", set2.max_size() = " << set2.max_size() << "\n" << std::endl;
 
-	std::cout << "set2.erase(-3);" << std::endl; set2.erase(-3);
+	std::cout << "set2.erase(-3);" << std::endl;
+	set2.erase(myPair<int, int>(-3, -3));
 	std::cout << "set2: "; print(set2);
 	std::cout << "set2.size() = " << set2.size() << "\n" << std::endl;
 
@@ -591,67 +631,7 @@ static void	relational_operators__tests(void)
 	std::cout << "set1 >= set2: " << (set1 >= set2) << std::endl;
 	std::cout << std::noboolalpha << std::endl;
 }
-/*
-static void	speed__tests(void)
-{
-	NMSP::set<std::vector<int> >			set1;
-	NMSP::set<std::vector<int> >			set2;
-	NMSP::set<std::vector<int> >::iterator	it;
-	int										i = 0;
 
-	for ( ; i < 5000; i += 2)
-		set1.insert(set1.begin(), std::vector<int>(i, i));
-	for ( ; i < 10000; i += 2)
-		it = set1.insert(set1.end(), std::vector<int>(i, i));
-	for ( ; i < 15000; i += 2)
-		it = set1.insert(it, std::vector<int>(i, i));
-	i = 1;
-	for ( ; i < 15000; i += 2)
-		set2.insert(std::vector<int>(i, i));
-	set1.insert(set2.begin(), set2.end());
-	for ( ; !set1.empty(); --i)
-		set1.erase(set1.begin());
-	set2.erase(set2.begin(), set2.end());
-}
-*/
-/*
-#include <sstream>
-static void	speed__tests(void)
-{
-	NMSP::set<std::string>				set1;
-	NMSP::set<std::string>				set2;
-	std::ostringstream					digit;
-	NMSP::set<std::string>::iterator	it;
-	int									i = 0;
-
-	for ( ; i < 500000; i += 2) {
-		digit << i; set1.insert(set1.begin(), std::string(digit.str()));
-		digit.seekp(0);
-	}
-	for ( ; i < 1000000; i += 2) {
-		digit << i; it = set1.insert(set1.end(), std::string(digit.str()));
-		digit.seekp(0);
-	}
-	for ( ; i < 1500000; i += 2) {
-		digit << i; it = set1.insert(it, std::string(digit.str()));
-		digit.seekp(0);
-	}
-	digit.str("");
-	i = 1;
-	for ( ; i < 1500000; i += 2) {
-		digit << i; set1.insert(std::string(digit.str()));
-		digit.seekp(0);
-	}
-	set1.insert(set2.begin(), set2.end());
-	digit.str("");
-	i = 0;
-	for ( ; !set1.empty(); ++i) {
-		digit << i; set1.erase(std::string(digit.str()));
-		digit.seekp(0);
-	}
-	set2.erase(set2.begin(), set2.end());
-}
-*/
 static void	speed__tests(void)
 {
 	NMSP::set<int>				set1;
@@ -659,19 +639,22 @@ static void	speed__tests(void)
 	NMSP::set<int>::iterator	it;
 	int							i = 0;
 
-	for ( ; i < 1000000; i += 2)
+	for ( ; i < SPEED_SET; i += 2)
 		set1.insert(set1.begin(), i);
-	for ( ; i < 1500000; i += 2)
+	for ( ; i < SPEED_SET + 500000; i += 2)
 		it = set1.insert(set1.end(), i);
-	for ( ; i < 2000000; i += 2)
+	for ( ; i < SPEED_SET + 1000000; i += 2)
 		it = set1.insert(it, i);
 	i = 1;
-	for ( ; i < 2000000; i += 2)
+	for ( ; i < SPEED_SET + 1000000; i += 2)
 		set1.insert(i);
 	set1.insert(set2.begin(), set2.end());
-	for ( ; !set1.empty(); --i)
-		set1.erase(i);
-	set2.erase(set2.begin(), set2.end());
+	while(!set1.empty())
+		set1.erase(i--);
+	set1.insert(set2.begin(), set2.end());
+	set1.erase(set1.begin(), set1.end());
+	while(!set2.empty())
+		set2.erase(set2.begin());
 }
 
 void	set__tests(bool testSpeed)
