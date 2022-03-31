@@ -6,7 +6,7 @@
 /*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 15:02:36 by jmazoyer         ###   ########.fr       */
+/*   Updated: 2022/03/31 17:56:25 by jmazoyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include "set.hpp"
 #include "colors.hpp"
 #include "enable_if.hpp"
+#include "is_integral.hpp"
+#include "iterator_traits.hpp"
 #include "pair.hpp"
 #include "make_pair.hpp"
 #include "detect_system.hpp"
@@ -49,6 +51,10 @@ static std::string	success(const char* str)
 	return (output);
 }
 
+/*
+** Self-explanatory: it prints a set's content
+*/
+
 template <typename Key, class Comp, class Alloc>
 static void	print(const NMSP::set<Key, Comp, Alloc>& set)
 {
@@ -63,12 +69,61 @@ static void	print(const NMSP::set<Key, Comp, Alloc>& set)
 }
 
 /*
+** Implement "is_const/is_const_pointer<T>" to check wether a type/pointer
+** is indeed related to a const type
+*/
+
+template <typename T>
+struct	is_const: public ft::false_type {
+};
+
+template <typename T>
+struct	is_const<const T>: public ft::true_type {
+};
+
+template <typename T>
+struct	is_const_pointer: public ft::false_type {
+};
+
+template <typename T>
+struct	is_const_pointer<const T*>: public ft::true_type {
+};
+
+/*
 ** Create a type that cannot be default constructed to test if the set
 ** can still be created
 */
 
 class	priv {
 	priv(void);
+};
+
+/*
+** Create a custom allocator to test with the set class
+*/
+
+template <typename T>
+class	myAlloc: public std::allocator<T> {
+public:
+	typedef size_t		size_type;
+	typedef T*			pointer;
+	typedef const T*	const_pointer;
+
+	myAlloc(): std::allocator<T>() { }
+	myAlloc(const myAlloc &a): std::allocator<T>(a) { }
+	template <class U>
+	myAlloc(const myAlloc<U>& alloc): std::allocator<T>(alloc) { }
+	~myAlloc() { }
+
+	pointer allocate(size_type n, const void* hint = NULL)
+	{
+		return (std::allocator<T>::allocate(n, hint));
+	}
+
+	void deallocate(pointer p, size_type n)
+	{
+		return (std::allocator<T>::deallocate(p, n));
+	}
 };
 
 /*
@@ -101,34 +156,6 @@ std::ostream&	operator<<(std::ostream& os, const myVec<T>& vec)
 }
 
 /*
-** Use a custom allocator to test with the _tree class
-*/
-
-template <typename T>
-class	myAlloc: public std::allocator<T> {
-public:
-	typedef size_t		size_type;
-	typedef T*			pointer;
-	typedef const T*	const_pointer;
-
-	myAlloc(): std::allocator<T>() { }
-	myAlloc(const myAlloc &a): std::allocator<T>(a) { }
-	template <class U>
-	myAlloc(const myAlloc<U>& alloc): std::allocator<T>(alloc) { }
-	~myAlloc() { }
-
-	pointer allocate(size_type n, const void* hint = NULL)
-	{
-		return (std::allocator<T>::allocate(n, hint));
-	}
-
-	void deallocate(pointer p, size_type n)
-	{
-		return (std::allocator<T>::deallocate(p, n));
-	}
-};
-
-/*
 ** Allow NMSP::pair to be used with "operator<<"
 */
 
@@ -152,7 +179,9 @@ std::ostream&	operator<<(std::ostream& os, const myPair<T1, T2>& pair)
 
 static void	typedef__tests(void)
 {
-	typedef NMSP::set<std::string>					set_t;
+	typedef NMSP::set<std::string>							set_t;
+	typedef ft::iterator_traits<set_t::iterator>			it_traits;
+	typedef ft::iterator_traits<set_t::reverse_iterator>	rev_it_traits;
 
 	std::string													x = "0";
 	std::less<std::string>										comp;
@@ -172,6 +201,10 @@ static void	typedef__tests(void)
 	ft::enable_if<true, set_t::const_iterator>::type			m;
 	ft::enable_if<true, set_t::reverse_iterator>::type			n;
 	ft::enable_if<true, set_t::const_reverse_iterator>::type	o;
+
+	if (!is_const_pointer<it_traits::pointer>::value
+			|| !is_const_pointer<rev_it_traits::pointer>::value)
+		std::cout << "Error: set iterators aren't const!\n" << std::endl;
 
 	(void)a; (void)b; (void)c; (void)d; (void)e; (void)f; (void)g; (void)h;
 	(void)i; (void)j; (void)k; (void)l; (void)m; (void)n; (void)o;

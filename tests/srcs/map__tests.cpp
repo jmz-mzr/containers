@@ -6,7 +6,7 @@
 /*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 15:01:55 by jmazoyer         ###   ########.fr       */
+/*   Updated: 2022/03/31 17:55:42 by jmazoyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include "map.hpp"
 #include "colors.hpp"
 #include "enable_if.hpp"
+#include "is_integral.hpp"
+#include "iterator_traits.hpp"
 #include "pair.hpp"
 #include "make_pair.hpp"
 #include "detect_system.hpp"
@@ -46,6 +48,10 @@ static std::string	success(const char* str)
 	return (output);
 }
 
+/*
+** Self-explanatory: it prints a map's content
+*/
+
 template <typename Key, typename T, class Comp, class Alloc>
 static void	print(const NMSP::map<Key, T, Comp, Alloc>& map)
 {
@@ -60,12 +66,61 @@ static void	print(const NMSP::map<Key, T, Comp, Alloc>& map)
 }
 
 /*
+** Implement "is_const/is_const_pointer<T>" to check wether a type/pointer
+** is indeed related to a const type
+*/
+
+template <typename T>
+struct	is_const: public ft::false_type {
+};
+
+template <typename T>
+struct	is_const<const T>: public ft::true_type {
+};
+
+template <typename T>
+struct	is_const_pointer: public ft::false_type {
+};
+
+template <typename T>
+struct	is_const_pointer<const T*>: public ft::true_type {
+};
+
+/*
 ** Create a type that cannot be default constructed to test if the map
-** can still be created
+** can still be empty created
 */
 
 class	priv {
 	priv(void);
+};
+
+/*
+** Create a custom allocator to test with the map class
+*/
+
+template <typename T>
+class	myAlloc: public std::allocator<T> {
+public:
+	typedef size_t		size_type;
+	typedef T*			pointer;
+	typedef const T*	const_pointer;
+
+	myAlloc(): std::allocator<T>() { }
+	myAlloc(const myAlloc &a): std::allocator<T>(a) { }
+	template <class U>
+	myAlloc(const myAlloc<U>& alloc): std::allocator<T>(alloc) { }
+	~myAlloc() { }
+
+	pointer allocate(size_type n, const void* hint = NULL)
+	{
+		return (std::allocator<T>::allocate(n, hint));
+	}
+
+	void deallocate(pointer p, size_type n)
+	{
+		return (std::allocator<T>::deallocate(p, n));
+	}
 };
 
 /*
@@ -98,34 +153,6 @@ std::ostream&	operator<<(std::ostream& os, const myVec<T>& vec)
 }
 
 /*
-** Use a custom allocator to test with the _tree class
-*/
-
-template <typename T>
-class	myAlloc: public std::allocator<T> {
-public:
-	typedef size_t		size_type;
-	typedef T*			pointer;
-	typedef const T*	const_pointer;
-
-	myAlloc(): std::allocator<T>() { }
-	myAlloc(const myAlloc &a): std::allocator<T>(a) { }
-	template <class U>
-	myAlloc(const myAlloc<U>& alloc): std::allocator<T>(alloc) { }
-	~myAlloc() { }
-
-	pointer allocate(size_type n, const void* hint = NULL)
-	{
-		return (std::allocator<T>::allocate(n, hint));
-	}
-
-	void deallocate(pointer p, size_type n)
-	{
-		return (std::allocator<T>::deallocate(p, n));
-	}
-};
-
-/*
 ** Build a heavy class to test the performance
 ** (the defined values depend on your machine: here my Linux VM cannot
 ** handle the same tests as my native MacOS)
@@ -146,8 +173,10 @@ private:
 
 static void	typedef__tests(void)
 {
-	typedef NMSP::map<int, int>					map_t;
-	typedef NMSP::map<int, int>::value_compare	comp_t;
+	typedef NMSP::map<int, int>									map_t;
+	typedef NMSP::map<int, int>::value_compare					comp_t;
+	typedef ft::iterator_traits<map_t::const_iterator>			it_traits;
+	typedef ft::iterator_traits<map_t::const_reverse_iterator>	rev_it_traits;
 
 	int															x = 0;
 	NMSP::pair<const int, int>									myPair;
@@ -171,6 +200,11 @@ static void	typedef__tests(void)
 	ft::enable_if<true, comp_t::result_type>::type				p = true;
 	ft::enable_if<true, comp_t::first_argument_type>::type		q = myPair;
 	ft::enable_if<true, comp_t::second_argument_type>::type		r = myPair;
+
+	if (!is_const_pointer<it_traits::pointer>::value
+			|| !is_const_pointer<rev_it_traits::pointer>::value)
+		std::cout << "Error: map const_iterators aren't const!\n"
+			<< std::endl;
 
 	(void)a; (void)b; (void)c; (void)d; (void)e; (void)f; (void)g; (void)h;
 	(void)i; (void)j; (void)k; (void)l; (void)m; (void)n; (void)o; (void)p;

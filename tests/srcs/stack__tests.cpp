@@ -6,7 +6,7 @@
 /*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 14:37:37 by jmazoyer         ###   ########.fr       */
+/*   Updated: 2022/03/31 17:53:36 by jmazoyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 //#include "stack.hpp"
 #include "hackFtStack.hpp"
 #include "enable_if.hpp"
+#include "is_integral.hpp"
+#include "iterator_traits.hpp"
 #include "colors.hpp"
 
 #ifndef STD
@@ -70,6 +72,36 @@ static void	print(const NMSP::stack<T, Container>& stack)
 }
 
 /*
+** Implement "is_const/is_const_pointer<T>" to check wether a type/pointer
+** is indeed related to a const type
+*/
+
+template <typename T>
+struct	is_const: public ft::false_type {
+};
+
+template <typename T>
+struct	is_const<const T>: public ft::true_type {
+};
+
+template <typename T>
+struct	is_const_pointer: public ft::false_type {
+};
+
+template <typename T>
+struct	is_const_pointer<const T*>: public ft::true_type {
+};
+
+/*
+** Create a type that cannot be default constructed to test if the stack
+** can still be empty created
+*/
+
+class	priv {
+	priv(void);
+};
+
+/*
 ** Build a heavy class to test the performance
 ** (the defined values depend on your machine: here my Linux VM cannot
 ** handle the same tests as my native MacOS)
@@ -90,18 +122,29 @@ private:
 
 static void	typedef__tests(void)
 {
-	typedef NMSP::stack<int, NMSP::vector<int> >		stack;
+	typedef NMSP::stack<int, NMSP::vector<int> >				stack;
+	typedef ft::iterator_traits<stack::container_type
+									::const_iterator>			it_traits;
+	typedef ft::iterator_traits<stack::container_type
+									::const_reverse_iterator>	rev_it_traits;
+
 	int													x = 42;
 	NMSP::vector<int>									vec1(1, 1);
 	ft::enable_if<true, stack::container_type>::type	vec2(vec1);
 	ft::enable_if<true, stack::value_type>::type		y = x;
 	ft::enable_if<true, stack::size_type>::type			size = vec2.size();
 
+	if (!is_const_pointer<it_traits::pointer>::value
+			|| !is_const_pointer<rev_it_traits::pointer>::value)
+		std::cout << "Error: stack const_iterators aren't const!\n"
+			<< std::endl;
+
 	(void)x; (void)vec1; (void)vec2; (void)y; (void)size;
 }
 
 static void	constructors_destructors__tests(void)
 {
+	NMSP::stack<priv>										stack00;
 	NMSP::stack<int>										stack;
 	NMSP::stack<std::string>								stack0;
 	NMSP::vector<std::string>								vec0(3, "Hello!");

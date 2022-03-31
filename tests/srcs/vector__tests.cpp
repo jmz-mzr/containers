@@ -6,7 +6,7 @@
 /*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 15:01:32 by jmazoyer         ###   ########.fr       */
+/*   Updated: 2022/03/31 17:53:03 by jmazoyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@
 #include <memory>
 #include <cstdio>
 #include "vector.hpp"
+#include "enable_if.hpp"
+#include "is_integral.hpp"
+#include "iterator_traits.hpp"
 #include "colors.hpp"
 
 #ifndef STD
@@ -76,7 +79,37 @@ void	print(const NMSP::vector<char>& vec)
 }
 
 /*
-** Use a custom allocator to test with the ft::vector class
+** Implement "is_const/is_const_pointer<T>" to check wether a type/pointer
+** is indeed related to a const type
+*/
+
+template <typename T>
+struct	is_const: public ft::false_type {
+};
+
+template <typename T>
+struct	is_const<const T>: public ft::true_type {
+};
+
+template <typename T>
+struct	is_const_pointer: public ft::false_type {
+};
+
+template <typename T>
+struct	is_const_pointer<const T*>: public ft::true_type {
+};
+
+/*
+** Create a type that cannot be default constructed to test if the vector
+** can still be empty created
+*/
+
+class	priv {
+	priv(void);
+};
+
+/*
+** Create a custom allocator to test with the vector class
 */
 
 template <typename T>
@@ -127,6 +160,9 @@ private:
 static void	typedef__tests(void)
 {
 	typedef NMSP::vector<int>									vec;
+	typedef ft::iterator_traits<vec::const_iterator>			it_traits;
+	typedef ft::iterator_traits<vec::const_reverse_iterator>	rev_it_traits;
+
 	int															x;
 	ft::enable_if<true, vec::value_type>::type					a;
 	ft::enable_if<true, vec::allocator_type>::type				b;
@@ -141,12 +177,18 @@ static void	typedef__tests(void)
 	ft::enable_if<true, vec::difference_type>::type				k;
 	ft::enable_if<true, vec::size_type>::type					l;
 
+	if (!is_const_pointer<it_traits::pointer>::value
+			|| !is_const_pointer<rev_it_traits::pointer>::value)
+		std::cout << "Error: vector const_iterators aren't const!\n"
+			<< std::endl;
+
 	(void)a; (void)b; (void)c; (void)d; (void)e; (void)f; (void)g; (void)h;
 	(void)i; (void)j; (void)k; (void)l;
 }
 
 static void	constructors_destructors__tests(void)
 {
+	NMSP::vector<priv>					vec00;
 	try {
 		NMSP::vector<std::string>		vec_2(LONG_MAX, "!");
 	} catch (const std::exception& e) {
