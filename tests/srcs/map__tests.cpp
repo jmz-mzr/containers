@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   map__tests.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
+/*   Updated: 2022/03/31 15:01:55 by jmazoyer         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <iostream>
 #include <map>
 #include <vector>
@@ -94,7 +106,7 @@ class	myAlloc: public std::allocator<T> {
 public:
 	typedef size_t		size_type;
 	typedef T*			pointer;
-	typedef const T* 	const_pointer;
+	typedef const T*	const_pointer;
 
 	myAlloc(): std::allocator<T>() { }
 	myAlloc(const myAlloc &a): std::allocator<T>(a) { }
@@ -204,12 +216,12 @@ static void	constructors_destructors__tests(void)
 
 static void	member_operators__tests(void)
 {
-	NMSP::map<std::string, std::string> 	map0;
+	NMSP::map<std::string, std::string>		map0;
 	NMSP::map<std::string, std::string>		map1;
 	map1.insert(NMSP::make_pair("02", "02"));
 	map1.insert(NMSP::make_pair("01", "01"));
 	map1.insert(NMSP::make_pair("00", "00"));
-	NMSP::map<std::string, std::string> 	map2(map1);
+	NMSP::map<std::string, std::string>		map2(map1);
 
 	std::cout << "map1: "; print(map1);
 	std::cout << "map2(map1): "; print(map2);

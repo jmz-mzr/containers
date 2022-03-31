@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector__tests.cpp                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
+/*   Updated: 2022/03/31 15:01:32 by jmazoyer         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <iostream>
 #include <vector>
 #include <climits>
@@ -72,7 +84,7 @@ class	myAlloc: public std::allocator<T> {
 public:
 	typedef size_t		size_type;
 	typedef T*			pointer;
-	typedef const T* 	const_pointer;
+	typedef const T*	const_pointer;
 
 	myAlloc(): std::allocator<T>() { /* fprintf(stderr, "myAlloc!\n"); */ }
 	myAlloc(const myAlloc &a): std::allocator<T>(a) { }

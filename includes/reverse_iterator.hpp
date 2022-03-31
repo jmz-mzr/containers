@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   reverse_iterator.hpp                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/31 14:37:36 by jmazoyer          #+#    #+#             */
+/*   Updated: 2022/03/31 15:05:14 by jmazoyer         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef REVERSE_ITERATOR_HPP
 # define REVERSE_ITERATOR_HPP
 
@@ -39,17 +51,17 @@ namespace	ft
 		reverse_iterator&	operator++(void) { --current; return (*this); }
 		reverse_iterator&	operator--(void) { ++current; return (*this); }
 		reverse_iterator	operator++(int) { reverse_iterator rev_it(*this);
-											  --current; return (rev_it); }
+												--current; return (rev_it); }
 		reverse_iterator	operator--(int) { reverse_iterator rev_it(*this);
-											  ++current; return (rev_it); }
+												++current; return (rev_it); }
 		reverse_iterator	operator+(diff_type n) const
 									{ return (reverse_iterator(current - n)); }
 		reverse_iterator	operator-(diff_type n) const
 									{ return (reverse_iterator(current + n)); }
 		reverse_iterator&	operator+=(diff_type n) { current -= n;
-													  return (*this); }
+														return (*this); }
 		reverse_iterator&	operator-=(diff_type n) { current += n;
-													  return (*this); }
+														return (*this); }
 
 		Iter	base(void) const { return (current); }
 	protected:

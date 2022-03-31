@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   set.hpp                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/31 14:37:36 by jmazoyer          #+#    #+#             */
+/*   Updated: 2022/03/31 15:04:10 by jmazoyer         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SET_HPP
 # define SET_HPP
 
@@ -11,7 +23,7 @@
 namespace	ft
 {
 	template <typename Key, class Compare = std::less<Key>,
-				 class Allocator = std::allocator<Key> >
+				class Allocator = std::allocator<Key> >
 	class	set {
 	public:
 		typedef Key										key_type;

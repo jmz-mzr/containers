@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   map.hpp                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/31 14:37:36 by jmazoyer          #+#    #+#             */
+/*   Updated: 2022/03/31 15:03:53 by jmazoyer         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MAP_HPP
 # define MAP_HPP
 
@@ -47,7 +59,7 @@ namespace	ft
 	/**************************************************************************/
 
 	template <typename Key, typename T, class Compare = std::less<Key>,
-			 class Allocator = std::allocator<ft::pair<const Key, T> > >
+				class Allocator = std::allocator<ft::pair<const Key, T> > >
 	class	map {
 	public:
 		typedef Key										key_type;

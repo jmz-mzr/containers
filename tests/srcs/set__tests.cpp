@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   set__tests.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
+/*   Updated: 2022/03/31 15:02:36 by jmazoyer         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <iostream>
 #include <set>
 #include <vector>
@@ -97,7 +109,7 @@ class	myAlloc: public std::allocator<T> {
 public:
 	typedef size_t		size_type;
 	typedef T*			pointer;
-	typedef const T* 	const_pointer;
+	typedef const T*	const_pointer;
 
 	myAlloc(): std::allocator<T>() { }
 	myAlloc(const myAlloc &a): std::allocator<T>(a) { }
@@ -169,7 +181,7 @@ static void	constructors_destructors__tests(void)
 {
 	typedef myVec<char>		vec_t;
 
-//	NMSP::set<int> 		/*Shouldn't compile*/		set00 = (std::less<int>());
+//	NMSP::set<int>		/*Shouldn't compile*/		set00 = (std::less<int>());
 	NMSP::set<priv>									set0;
 	NMSP::set<vec_t, std::less<vec_t> >				set1((std::less<vec_t>()));
 	NMSP::set<vec_t, std::less<vec_t>,
@@ -181,7 +193,7 @@ static void	constructors_destructors__tests(void)
 	set2.insert(vec_t(4, 'd'));
 	set2.insert(vec_t(3, 'c'));
 	const NMSP::set<vec_t, std::less<vec_t>,
-		  						myAlloc<vec_t> >	set3(set2);
+								myAlloc<vec_t> >	set3(set2);
 	NMSP::set<vec_t>								set4(set3.begin(),
 															set3.end());
 	NMSP::set<vec_t>								set5(set3.begin(),
@@ -208,7 +220,7 @@ static void	member_operators__tests(void)
 	set1.insert("02");
 	set1.insert("01");
 	set1.insert("00");
-	NMSP::set<std::string> 			set2(set1);
+	NMSP::set<std::string>			set2(set1);
 
 	std::cout << "set1: "; print(set1);
 	std::cout << "set2(set1): "; print(set2);
