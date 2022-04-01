@@ -6,7 +6,7 @@
 #    By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/05 20:03:04 by jmazoyer          #+#    #+#              #
-#    Updated: 2022/03/31 15:00:26 by jmazoyer         ###   ########.fr        #
+#    Updated: 2022/04/01 14:46:11 by jmazoyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,10 +14,11 @@
 #                                    CONFIG                                    #
 ################################################################################
 
-NAME		= ft_containers_tests
-NAME_STD	= ft_containers_tests_std
-NAME_TREE	= _tree_tests
-AUTHOR		= jmazoyer
+NAME		 = ft_containers_tests
+NAME_STD	 = ft_containers_tests_std
+NAME_TREE	 = _tree_tests
+NAME_SUBJECT = subject_tests
+AUTHOR		 = jmazoyer
 
 CC			= clang++
 CFLAGS		= -Wall -Wextra -Werror -std=c++98
@@ -54,13 +55,18 @@ SRC_NAME		=	main.cpp							\
 
 SRC_TREE		=	_tree__tests.cpp
 
+SRC_SUBJECT		=	subject_main.cpp
+
 OBJ_PATH		= objs
 OBJ				= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=.o))
 OBJ_STD			= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=_std.o))
 
 OBJ_TREE		= $(addprefix $(OBJ_PATH)/, $(SRC_TREE:.cpp=.o))
 
-DEP				= $(OBJ:.o=.d) $(OBJ_STD:.o=.d) $(OBJ_TREE:.o=.d)
+OBJ_SUBJECT		= $(addprefix $(OBJ_PATH)/, $(SRC_SUBJECT:.cpp=.o))
+
+DEP				= $(OBJ:.o=.d) $(OBJ_STD:.o=.d) $(OBJ_TREE:.o=.d) \
+					$(OBJ_SUBJECT:.o=.d)
 
 VPATH			= $(SRC_PATH)
 
@@ -164,6 +170,8 @@ add_flags:
 
 tree: header $(NAME_TREE)
 
+subject: header $(NAME_SUBJECT)
+
 header:
 	@if [ $(S) -eq 1 ]; then \
 		:; \
@@ -192,6 +200,10 @@ $(NAME_STD): $(OBJ_STD)
 
 $(NAME_TREE): $(OBJ_TREE)
 	@$(call run,$(CC) $(CFLAGS) $(OBJ_TREE) -o $@,$(LINK),$(B_GREEN))
+	$(eval F=1)
+
+$(NAME_SUBJECT): $(OBJ_SUBJECT)
+	@$(call run,$(CC) $(CFLAGS) $(OBJ_SUBJECT) -o $@,$(LINK),$(B_GREEN))
 	$(eval F=1)
 
 $(OBJ_PATH)/%.o: %.cpp | $(OBJ_PATH)
