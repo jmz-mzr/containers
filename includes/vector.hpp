@@ -6,7 +6,7 @@
 /*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 14:37:37 by jmazoyer         ###   ########.fr       */
+/*   Updated: 2022/04/04 11:43:55 by jmazoyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,11 @@
 # include "lexicographical_compare.hpp"
 # include "detect_system.hpp"
 
-# define LENGTH_ERR		"vector"
+# if LIBSTDCPP
+#  define LENGTH_ERR	"cannot create std::vector larger than max_size()"
+# else
+#  define LENGTH_ERR	"vector"
+# endif
 # define RANGE_ERR		"vector"
 
 namespace	ft
@@ -218,7 +222,7 @@ namespace	ft
 	template <typename T, class Alloc>
 	void	vector<T, Alloc>::_allocate(size_type n)
 	{
-		if (!LIBSTDCPP && n > max_size())
+		if (n > max_size())
 			throw std::length_error(LENGTH_ERR);
 		_begin = _alloc.allocate(n);
 		_end = _begin;
@@ -494,8 +498,7 @@ namespace	ft
 			else
 				_destruct_at_end(new_end);
 		} else if (LIBSTDCPP && new_size > max_size()) {
-			throw std::length_error("cannot create std::vector"
-					"larger than max_size()");
+			throw std::length_error(LENGTH_ERR);
 		} else {
 			_deallocate();
 			_allocate(_optimal_size(new_size));
