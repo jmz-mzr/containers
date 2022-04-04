@@ -6,7 +6,7 @@
 /*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 14:37:37 by jmazoyer         ###   ########.fr       */
+/*   Updated: 2022/04/04 16:25:43 by jmazoyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ bool	isEven(T i, typename NMSP::enable_if
 }
 
 /*
-** Levaraging SFINAE, the right function should be selected from
+** Leveraging SFINAE, the right function should be selected from
 ** the Overload Set without any compilation error
 */
 
@@ -68,7 +68,7 @@ typename NMSP::enable_if<(sizeof(T) > sizeof(int))>::type	cmpToInt(void)
 }
 
 /*
-** If implemented correctly, is_integral calls should be valid with
+** If implemented correctly, isIntegral calls should be valid with
 ** either the "::value" member or the "()" type operator, and ignore
 ** the topmost "const" and "volatile" qualifiers
 */
@@ -108,6 +108,7 @@ void	enable_if__is_integral__tests(void)
 	std::cout << "const short int "; isIntegral<const short int>();
 	std::cout << "const signed int "; isIntegral<const signed int>();
 	std::cout << "volatile unsigned "; isIntegral<volatile unsigned>();
+	std::cout << "const volatile long "; isIntegral<const volatile long>();
 	std::cout << "long long "; isIntegral<long long>();
 	std::cout << "size_t "; isIntegral<size_t>();
 	std::cout << "float "; isIntegral<float>();
