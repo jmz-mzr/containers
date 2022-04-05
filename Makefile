@@ -6,7 +6,7 @@
 #    By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/02/05 20:03:04 by jmazoyer          #+#    #+#              #
-#    Updated: 2022/04/01 14:46:11 by jmazoyer         ###   ########.fr        #
+#    Updated: 2022/04/05 16:20:20 by jmazoyer         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -222,10 +222,10 @@ clean: header
 	@$(call run,$(RM) $(OBJ_PATH) *.log,clean)
 
 fclean: clean
-	@$(call run,$(RM) $(NAME) $(NAME_STD),fclean)
+	@$(call run,$(RM) $(NAME) $(NAME_STD) $(NAME_TREE) $(NAME_SUBJECT),fclean)
 
 re: fclean all
 
 -include $(DEP)
 
-.PHONY: all debug add_flags header clean fclean re
+.PHONY: all debug add_flags tree subject header clean fclean re
