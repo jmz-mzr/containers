@@ -6,7 +6,7 @@
 /*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 17:53:36 by jmazoyer         ###   ########.fr       */
+/*   Updated: 2022/04/05 15:14:47 by jmazoyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,17 +148,23 @@ static void	constructors_destructors__tests(void)
 	NMSP::stack<int>										stack;
 	NMSP::stack<std::string>								stack0;
 	NMSP::vector<std::string>								vec0(3, "Hello!");
+	std::vector<std::string>								vec1(5, "Hi!");
 	NMSP::stack<std::string, NMSP::vector<std::string> >	stack1(vec0);
-	NMSP::stack<std::string, NMSP::vector<std::string> >	stack2(stack1);
+	NMSP::stack<std::string, std::vector<std::string> >		stack2(vec1);
+	NMSP::stack<std::string, NMSP::vector<std::string> >	stack3(stack1);
 	std::list<int>											list(2, 21);
-	NMSP::stack<int, std::list<int> >						stack3(list);
-//	NMSP::stack<std::string, NMSP::vector<std::string> >	stack4 = vec0;
+	NMSP::stack<int, std::list<int> >						stack4(list);
+	std::deque<float>										deque(7, 42.21f);
+	NMSP::stack<float, std::deque<float> >					stack5(deque);
+//	NMSP::stack<std::string, NMSP::vector<std::string> >	stack6 = vec0;
 //	explicit constructor shouldn't allow this to compile!
 
 	(void)stack; (void)stack0;
 	std::cout << "stack1 ="; print(stack1);
 	std::cout << "stack2 ="; print(stack2);
-	std::cout << "stack3 ="; print(stack3); std::cout << std::endl;
+	std::cout << "stack3 ="; print(stack3);
+	std::cout << "stack4 ="; print(stack4);
+	std::cout << "stack5 ="; print(stack5); std::cout << std::endl;
 }
 
 static void	member_operators__tests(void)
@@ -215,11 +221,14 @@ static void	member_functions__tests(void)
 	std::list<int>											list(2, 21);
 	const NMSP::stack<int, std::list<int> >					stack3(list);
 	const int&												x = stack3.top();
+	std::deque<float>										deque(1, 42.21f);
+	NMSP::stack<float, std::deque<float> >					stack4(deque);
 
 	std::cout << "stack0 (const) ="; print(stack0);
 	std::cout << "stack1 ="; print(stack1);
 	std::cout << "stack2 ="; print(stack2);
-	std::cout << "stack3 (const) ="; print(stack3); std::cout << std::endl;
+	std::cout << "stack3 (const) ="; print(stack3);
+	std::cout << "stack4 ="; print(stack4); std::cout << std::endl;
 
 	std::cout << std::boolalpha;
 	std::cout << "stack0.empty() = " << stack0.empty() << std::endl;
@@ -236,6 +245,12 @@ static void	member_functions__tests(void)
 	std::cout << "stack2.pop();" << std::endl;
 	stack2.pop();
 	std::cout << "stack2 ="; print(stack2); std::cout << std::endl;
+	std::cout << "stack4 ="; print(stack4);
+	std::cout << "stack4.pop();" << std::endl;
+	stack4.pop();
+	std::cout << "stack4.push(0.0f);" << std::endl;
+	stack4.push(0.0f);
+	std::cout << "stack4 ="; print(stack4); std::cout << std::endl;
 }
 
 static void	speed__tests(void)
