@@ -6,7 +6,7 @@
 /*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/04/04 11:43:55 by jmazoyer         ###   ########.fr       */
+/*   Updated: 2022/04/07 14:06:48 by jmazoyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,8 +176,7 @@ namespace	ft
 		typename ft::enable_if<!ft::is_integral<InputIt>::value, void*>::type):
 						_alloc(alloc), _begin(NULL), _end(NULL), _limit(NULL)
 	{
-		for ( ; first != last; ++first)
-			push_back(*first);
+		assign(first, last);
 	}
 
 	template <typename T, class Alloc>

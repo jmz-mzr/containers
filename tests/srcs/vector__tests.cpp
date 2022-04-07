@@ -6,7 +6,7 @@
 /*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 17:53:03 by jmazoyer         ###   ########.fr       */
+/*   Updated: 2022/04/07 14:02:13 by jmazoyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,13 +219,24 @@ static void	constructors_destructors__tests(void)
 	} catch (const std::exception& e) {
 		std::cout << "* Exception: " << e.what() << std::endl;
 	}
+	NMSP::vector<int>					vec6(10, 1);
+	NMSP::vector<int>					vec7(vec6.begin(), vec6.end());
 
 	std::cout << "vec0 ="; print(vec0);
+	std::cout << "vec0.capacity() = " << vec0.capacity() << "\n" << std::endl;
 	std::cout << "vec3 ="; print(vec3);
+	std::cout << "vec3.capacity() = " << vec3.capacity() << "\n" << std::endl;
 	std::cout << "vec4 ="; print(vec4);
+	std::cout << "vec4.capacity() = " << vec4.capacity() << "\n" << std::endl;
 	std::cout << "vec5 ="; print(vec5);
+	std::cout << "vec5.capacity() = " << vec5.capacity() << "\n" << std::endl;
 	std::cout << "vec3 = vec5;" << std::endl; vec3 = vec5;
 	std::cout << "vec3 ="; print(vec3);
+	std::cout << "vec3.capacity() = " << vec3.capacity() << "\n" << std::endl;
+	std::cout << "vec6 ="; print(vec6);
+	std::cout << "vec6.capacity() = " << vec6.capacity() << "\n" << std::endl;
+	std::cout << "vec7 ="; print(vec7);
+	std::cout << "vec7.capacity() = " << vec7.capacity() << std::endl;
 	std::cout << std::endl;
 }
 
