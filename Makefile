@@ -1,24 +1,14 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/02/05 20:03:04 by jmazoyer          #+#    #+#              #
-#    Updated: 2022/04/05 16:20:20 by jmazoyer         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 ################################################################################
 #                                    CONFIG                                    #
 ################################################################################
 
-NAME		 = ft_containers_tests
-NAME_STD	 = ft_containers_tests_std
-NAME_TREE	 = _tree_tests
-NAME_SUBJECT = subject_tests
-AUTHOR		 = jmazoyer
+NAME		 	= ft_containers_tests
+NAME_STD	 	= ft_containers_tests_std
+NAME_TREE	 	= _tree_tests
+NAME_HACK_STACK	= demo_hack_stack
+NAME_42		 	= 42_tests
+NAME_42_STD	 	= 42_tests_std
+AUTHOR		 	= jmazoyer
 
 CC			= clang++
 CFLAGS		= -Wall -Wextra -Werror -std=c++98
@@ -38,7 +28,8 @@ F			= 1
 INC_PATH		= includes			\
 				  tests/includes
 
-SRC_PATH		= tests/srcs
+SRC_PATH		= tests				\
+				  tests/srcs
 
 SRC_NAME		=	main.cpp							\
 					enable_if__is_integral__tests.cpp	\
@@ -55,7 +46,9 @@ SRC_NAME		=	main.cpp							\
 
 SRC_TREE		=	_tree__tests.cpp
 
-SRC_SUBJECT		=	subject_main.cpp
+SRC_HACK_STACK	=	hack_stack_main.cpp
+
+SRC_42			=	42_main.cpp
 
 OBJ_PATH		= objs
 OBJ				= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=.o))
@@ -63,10 +56,13 @@ OBJ_STD			= $(addprefix $(OBJ_PATH)/, $(SRC_NAME:.cpp=_std.o))
 
 OBJ_TREE		= $(addprefix $(OBJ_PATH)/, $(SRC_TREE:.cpp=.o))
 
-OBJ_SUBJECT		= $(addprefix $(OBJ_PATH)/, $(SRC_SUBJECT:.cpp=.o))
+OBJ_HACK_STACK	= $(addprefix $(OBJ_PATH)/, $(SRC_HACK_STACK:.cpp=.o))
+
+OBJ_42			= $(addprefix $(OBJ_PATH)/, $(SRC_42:.cpp=.o))
+OBJ_42_STD		= $(addprefix $(OBJ_PATH)/, $(SRC_42:.cpp=_std.o))
 
 DEP				= $(OBJ:.o=.d) $(OBJ_STD:.o=.d) $(OBJ_TREE:.o=.d) \
-					$(OBJ_SUBJECT:.o=.d)
+					$(OBJ_42:.o=.d)
 
 VPATH			= $(SRC_PATH)
 
@@ -170,7 +166,12 @@ add_flags:
 
 tree: header $(NAME_TREE)
 
-subject: header $(NAME_SUBJECT)
+demo: header $(NAME_HACK_STACK)
+
+test: all tester_42 demo
+	@./tests/run_tests.sh
+
+tester_42: header $(NAME_42) $(NAME_42_STD)
 
 header:
 	@if [ $(S) -eq 1 ]; then \
@@ -202,8 +203,16 @@ $(NAME_TREE): $(OBJ_TREE)
 	@$(call run,$(CC) $(CFLAGS) $(OBJ_TREE) -o $@,$(LINK),$(B_GREEN))
 	$(eval F=1)
 
-$(NAME_SUBJECT): $(OBJ_SUBJECT)
-	@$(call run,$(CC) $(CFLAGS) $(OBJ_SUBJECT) -o $@,$(LINK),$(B_GREEN))
+$(NAME_HACK_STACK): $(OBJ_HACK_STACK)
+	@$(call run,$(CC) $(CFLAGS) $(OBJ_HACK_STACK) -o $@,$(LINK),$(B_GREEN))
+	$(eval F=1)
+
+$(NAME_42): $(OBJ_42)
+	@$(call run,$(CC) $(CFLAGS) $(OBJ_42) -o $@,$(LINK),$(B_GREEN))
+	$(eval F=1)
+
+$(NAME_42_STD): $(OBJ_42_STD)
+	@$(call run,$(CC) $(CFLAGS) $(OBJ_42_STD) -o $@,$(LINK),$(B_GREEN))
 	$(eval F=1)
 
 $(OBJ_PATH)/%.o: %.cpp | $(OBJ_PATH)
@@ -222,10 +231,11 @@ clean: header
 	@$(call run,$(RM) $(OBJ_PATH) *.log,clean)
 
 fclean: clean
-	@$(call run,$(RM) $(NAME) $(NAME_STD) $(NAME_TREE) $(NAME_SUBJECT),fclean)
+	@$(call run,$(RM) $(NAME) $(NAME_STD) $(NAME_TREE) $(NAME_HACK_STACK) \
+		$(NAME_42) $(NAME_42_STD),fclean)
 
 re: fclean all
 
 -include $(DEP)
 
-.PHONY: all debug add_flags tree subject header clean fclean re
+.PHONY: all debug add_flags tree demo test tester_42 header clean fclean re
