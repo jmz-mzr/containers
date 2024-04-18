@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   stack.hpp                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 14:37:37 by jmazoyer         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef STACK_HPP
 # define STACK_HPP
 
@@ -30,13 +18,18 @@ namespace	ft
 ** against which the libc++ and libstdc++ implementations aren't protected
 ** (see examples in "hackFtStack.hpp" and "hackStdStack.hpp")
 */
-/*	template <typename T, class Container>
-	class	stack;
-	template <typename T, class Container>
-	bool	operator==(const stack<T, Container>&, const stack<T, Container>&);
-	template <typename T, class Container>
-	bool	operator<(const stack<T, Container>&, const stack<T, Container>&);
+/*
+** This would have protected the stack against this universal friendship
+** To swith methods and enable this one, uncomment the next lines and
+** the lines 50-51, and then comment the lines 53-58
 */
+	// template <typename T, class Container>
+	// class	stack;
+	// template <typename T, class Container>
+	// bool	operator==(const stack<T, Container>&, const stack<T, Container>&);
+	// template <typename T, class Container>
+	// bool	operator<(const stack<T, Container>&, const stack<T, Container>&);
+
 	template <typename T, class Container = ft::vector<T> >
 	class	stack {
 	public:
@@ -54,15 +47,15 @@ namespace	ft
 														c.push_back(value); }
 		void				pop(void) { c.pop_back(); }
 
-//		friend bool	operator== <>(const stack& lhs, const stack& rhs);
-//		friend bool	operator< <>(const stack& lhs, const stack& rhs);
+		// friend bool	operator== <>(const stack& lhs, const stack& rhs);
+		// friend bool	operator< <>(const stack& lhs, const stack& rhs);
 
 		template <typename T1, class C1>
 		friend bool	operator==(const stack<T1, C1>& lhs,
-								const stack<T1, C1>&rhs);
+								const stack<T1, C1>& rhs);
 		template <typename T1, class C1>
 		friend bool	operator<(const stack<T1, C1>& lhs,
-								const stack<T1, C1>&rhs);
+								const stack<T1, C1>& rhs);
 	protected:
 		Container	c;
 	};

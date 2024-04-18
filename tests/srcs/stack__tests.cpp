@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   stack__tests.cpp                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/04/05 15:14:47 by jmazoyer         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <iostream>
 //#include <stack>
 #include "hackStdStack.hpp"
@@ -179,6 +167,14 @@ static void	member_operators__tests(void)
 	std::cout << "stack1 = stack2;" << std::endl;
 	stack1 = stack2;
 	std::cout << "stack1 ="; print(stack1); std::cout << std::endl;
+}
+
+namespace	std {
+	std::stack<int>	stackI;
+}
+namespace	ft
+{
+	ft::stack<int>	stackI;
 }
 
 static void	relational_operators__tests(void)

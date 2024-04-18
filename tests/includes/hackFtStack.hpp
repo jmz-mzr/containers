@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   hackFtStack.hpp                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 14:37:37 by jmazoyer         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef HACKFTSTACK_HPP
 # define HACKFTSTACK_HPP
 
@@ -29,6 +17,19 @@ namespace	ft
 		stack.c.push_back(11);
 		std::cout << "[stack.c.back() = " << stack.c.back() << "] ";
 		return (false);
+	}
+	
+	extern ft::stack<int>	stackI;
+
+	template<>
+	bool	operator==(const stack<double>& lhs,
+						const stack<double>& rhs)
+	{
+		if (stackI.size() > 1)
+			stackI.c.insert(stackI.c.begin() + 1, 11);
+		else
+			stackI.c.push_back(22);
+		return (lhs.c == rhs.c);
 	}
 }
 
