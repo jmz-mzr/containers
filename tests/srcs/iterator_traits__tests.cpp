@@ -58,7 +58,7 @@ typename NMSP::iterator_traits<Iter>::difference_type
 
 /*
 ** The "const T*" specialization should be implemented for the "::value_type"
-** member not be const qualified
+** member not to be const qualified, and thus assignable without error
 */
 
 template <typename BidirIt>

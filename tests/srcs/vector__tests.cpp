@@ -193,10 +193,12 @@ static void	constructors_destructors__tests(void)
 		NMSP::vector<std::string>		vec_2(LONG_MAX, "!");
 	} catch (const std::exception& e) {
 		std::cout << "* Exception: " << e.what() << std::endl;
+		// Depending on your platform, exceptions' messages can differ
 	} try {
 		NMSP::vector<int>				vec_1(-1, 10);
 	} catch (const std::exception& e) {
 		std::cout << "* Exception: " << e.what() << std::endl;
+		// Depending on your platform, exceptions' messages can differ
 	}
 	NMSP::vector<int>					vec0(0, 10);
 	NMSP::vector<int>					vec1;
@@ -218,6 +220,7 @@ static void	constructors_destructors__tests(void)
 		std::cout << "vec6.size() = " << vec6.size() << std::endl;
 	} catch (const std::exception& e) {
 		std::cout << "* Exception: " << e.what() << std::endl;
+		// Depending on your platform, exceptions' messages can differ
 	}
 	NMSP::vector<int>					vec6(10, 1);
 	NMSP::vector<int>					vec7(vec6.begin(), vec6.end());
@@ -368,11 +371,13 @@ static void	capacity__tests(void)
 	try { vec1.reserve(vec1.max_size() + 1);
 	} catch (const std::exception& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
+		// Depending on your platform, exceptions' messages can differ
 	std::cout << "vec1 ="; print(vec1);
 	std::cout << "vec1.resize(vec1.max_size() + 1): ";
 	try { vec1.resize(vec1.max_size() + 1);
 	} catch (const std::exception& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
+		// Depending on your platform, exceptions' messages can differ
 	std::cout << "vec1 ="; print(vec1); std::cout << std::endl;
 
 	std::cout << "vec1.reserve(2);" << std::endl; vec1.reserve(2);
@@ -415,18 +420,23 @@ static void	element_access__tests(void)
 	std::cout << "vec0.at(0): "; try { std::cout << vec0.at(0) << std::endl;
 	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
+		// Depending on your platform, exceptions' messages can differ
 	std::cout << "vec1.at(0): "; try { std::cout << vec1.at(0) << std::endl;
 	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
+		// Depending on your platform, exceptions' messages can differ
 	std::cout << "vec1.at(1): "; try { std::cout << vec1.at(1) << std::endl;
 	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
+		// Depending on your platform, exceptions' messages can differ
 	std::cout << "vec2.at(-1): "; try { std::cout << vec2.at(-1) << std::endl;
 	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
+		// Depending on your platform, exceptions' messages can differ
 	std::cout << "vec2.at(2): "; try { std::cout << vec2.at(2) << std::endl;
 	} catch (const std::out_of_range& e) { std::cout << "* Exception: "
 		<< e.what() << std::endl; }
+		// Depending on your platform, exceptions' messages can differ
 	std::cout << std::endl << std::boolalpha
 		<< "vec1.get_allocator() == vec2.get_allocator(): "
 		<< (vec1.get_allocator() == vec2.get_allocator())
@@ -456,6 +466,7 @@ static void	modifiers__tests(void)
 	try { vec0.assign((long)&vec2[0] + offset, (long)&vec2[2] + offset);
 	} catch (const std::exception& e) { 
 		std::cout << "* Exception: " << e.what() << std::endl; }
+		// Depending on your platform, exceptions' messages can differ
 	std::cout << "vec0 ="; print(vec0); std::cout << std::endl;
 
 	std::cout << "vec0.assign(0, 1);" << std::endl; vec0.assign(0, 1);
@@ -538,6 +549,7 @@ static void	modifiers__tests(void)
 	try { vec0.insert(vec0.begin(), vec0.max_size(), 2);
 	} catch (const std::exception& e) { 
 		std::cout << "* Exception: " << e.what() << "\n" << std::endl; }
+		// Depending on your platform, exceptions' messages can differ
 
 	iStr.clear(); iStr.seekg(0); firstInt = iStr; std::cout
 		<< "vec1.insert(vec1.begin() + 2, iStr.first, iStr.last);" << std::endl;
