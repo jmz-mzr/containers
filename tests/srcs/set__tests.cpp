@@ -29,7 +29,7 @@
 #endif
 
 #ifdef __APPLE__
-# define SPEED_SET			3500000
+# define SPEED_SET			4000000
 #elif defined(__linux__)
 # define SPEED_SET			4500000
 #endif
