@@ -1,9 +1,11 @@
 .DS_Store
+.vscode
 *.swp
 *.log
 *.o
 *.d
-ft_containers_tests
-ft_containers_tests_std
+ft_containers_tests*
 _tree_tests
-subject_tests
+42_tests*
+tests/results
+demo_hack_stack
