@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/03/31 14:37:37 by jmazoyer         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <iostream>
 #include "colors.hpp"
 #include "tests.hpp"
@@ -31,12 +19,15 @@ void	printHeader(const std::string& str, bool addNewline = true)
 void	printSuccess(const std::string& flags)
 {
 	std::cout << B_GREEN << "[OK]" << NO_COLOR
-		<< " All tests ran successfully!";
+		<< " All tests ran successfully!" << std::endl;
+	std::cout << "\nTo go even further, try uncommenting some tests in the "
+			"'tests/srcs/xxx__tests.cpp'\nfiles to see if the "
+			"compilation fails or not!" << std::endl;
 	if (flags != "-v" && flags != "-a" && flags != "-s"
 			&& flags != "-m" && flags != "-set")
 		std::cout << "\nTo compare the \"ft::\" containers' speed with the"
 			" \"std::\" ones, re-run these test with\nthe corresponding flag:"
-			" -v (vector), -s (stack), -m (map), -set (set), or -a (all)";
+			" -v (vector), -s (stack), -m (map), -S (set), or -a (all)";
 	std::cout << std::endl;
 }
 
@@ -67,7 +58,7 @@ int	main(int argc, char** argv)
 	printHeader("MAP", false);
 	map__tests(flags == "-m" || flags == "-a");
 	printHeader("SET", false);
-	set__tests(flags == "-set" || flags == "-a");
+	set__tests(flags == "-S" || flags == "-a");
 	printSuccess(flags);
 	return (0);
 }
