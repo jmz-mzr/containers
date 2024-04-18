@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   vector.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jmazoyer <jmazoyer@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/31 14:37:37 by jmazoyer          #+#    #+#             */
-/*   Updated: 2022/04/07 14:06:48 by jmazoyer         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
@@ -334,13 +322,15 @@ namespace	ft
 	** for the "std::vector<T>::reserve" function and did not throw the
 	** "std::length_error" exception when "n > max_size()" but instead
 	** propagated the exception thrown from "allocator<T>::allocate"
-	** This behaviour is reproduced to conform to the subject
+	** If commenting the lines 344-345, this behaviour will be reproduced
 	*/
 	template <typename T, class Alloc>
 	void	vector<T, Alloc>::reserve(size_type n)
 	{
 		if (LIBSTDCPP && n > max_size())
 			throw std::length_error("vector::reserve");
+		if (n > max_size())
+			throw std::length_error(LENGTH_ERR);
 		if (n > capacity())
 			_reallocate(n);
 	}
